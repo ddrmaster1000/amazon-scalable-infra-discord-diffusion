@@ -1,0 +1,43 @@
+{
+    "name": "sparkle",
+    "type": 1,
+    "description": "Create *sparkly* images from text",
+    "options": [
+        {
+            "name": "prompt",
+            "description": "Description of the image to be generated.",
+            "type": 3,
+            "required": "True"
+        },
+        {
+            "name": "seed",
+            "description": "The seed to use for the computation. Use the same seed to get the same image.",
+            "type": 4,
+            "required": "False"
+        },
+        {
+            "name": "steps",
+            "description": "The number of iterations to complete. Higher number takes longer.",
+            "type": 4,
+            "required": "False",
+            "choices": [
+                {
+                    "name": "8",
+                    "value": 8
+                },
+                {
+                    "name": "16",
+                    "value": 16
+                },
+                {
+                    "name": "32",
+                    "value": 32
+                },
+                {
+                    "name": "64",
+                    "value": 64
+                }
+            ]
+        }
+    ]
+}
