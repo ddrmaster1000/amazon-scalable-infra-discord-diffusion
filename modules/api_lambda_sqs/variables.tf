@@ -23,16 +23,6 @@ variable "discord_public_key" {
   type        = string
 }
 
-variable "sqs_arn" {
-  description = "SQS arn that handles backlog of user requests"
-  type = string
-}
-
-variable "sqs_url" {
-  description = "SQS url that handles backlog of user requests"
-  type = string
-}
-
 variable "pynacl_arn" {
   description = "Lambda Layer pynacl's arn"
   type = string

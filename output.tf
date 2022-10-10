@@ -1,3 +1,3 @@
-# output "discord_interactions_endpoint_url" {
-#   value = aws_apigatewayv2_api.discord_gw.api_endpoint
-# }
+output "discord_interactions_endpoint_url" {
+  value = module.api_gw_lambda.discord_interactions_endpoint_url
+}

@@ -43,7 +43,7 @@ def validateRequest(r):
 
 def lambda_handler(event, context):
 
-    DISCORD_TOKEN = ssm.get_parameter(Name='/DISCORD_TOKEN', WithDecryption=True)['Parameter']['Value']
+    DISCORD_TOKEN = ssm.get_parameter(Name='/BOT_TOKEN', WithDecryption=True)['Parameter']['Value']
     # For authorization, you can use either your bot token
     headers = {
         "Authorization": f"Bot {DISCORD_TOKEN}"

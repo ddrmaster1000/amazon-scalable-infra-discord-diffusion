@@ -1,8 +1,46 @@
-# # All required IAM resources
+# API Gateway, Discord Lambda handler, and SQS
 locals {
   discord_api_to_lambda     = "lambda-api-${var.project_id}"
   log_discord_api_to_lambda = "/aws/lambda/${local.discord_api_to_lambda}"
 }
+
+# Create the SQS Queue
+resource "aws_sqs_queue" "default_queue" {
+  name_prefix                = var.project_id
+  visibility_timeout_seconds = 120
+  max_message_size           = 262144
+  receive_wait_time_seconds  = 20
+  sqs_managed_sse_enabled = true
+  fifo_queue                  = true
+  content_based_deduplication = true
+}
+
+### API Gateway ###
+resource "aws_apigatewayv2_api" "discord_gw" {
+  name          = "discord-diffusion"
+  description = "HTTP Gateway for Discord Requests"
+  protocol_type = "HTTP"
+  cors_configuration {
+    allow_headers = ["*"]
+    allow_methods = ["OPTIONS", "PUT"]
+    allow_origins = ["https://discord.com"]
+  }
+  ## Note: payload_format_version must be version 2.0 for this project
+  target = aws_lambda_function.discord_api_to_lambda.arn
+  route_key = "POST /"
+  depends_on = [
+    aws_lambda_function.discord_api_to_lambda
+  ]
+}
+
+resource "aws_lambda_permission" "apigw" {
+	action        = "lambda:InvokeFunction"
+	function_name = aws_lambda_function.discord_api_to_lambda.arn
+	principal     = "apigateway.amazonaws.com"
+
+	source_arn = "${aws_apigatewayv2_api.discord_gw.execution_arn}/*/*"
+}
+
 
 ### Discord API First Response ###
 resource "aws_lambda_function" "discord_api_to_lambda" {
@@ -21,7 +59,7 @@ resource "aws_lambda_function" "discord_api_to_lambda" {
     variables = {
       APPLICATION_ID = var.discord_application_id,
       PUBLIC_KEY     = var.discord_public_key,
-      SQS_QUEUE_URL  = var.sqs_url
+      SQS_QUEUE_URL  = aws_sqs_queue.default_queue.url
     }
   }
 
@@ -62,7 +100,7 @@ resource "aws_iam_policy" "discord_api_lambda_logging" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:${local.log_discord_api_to_lambda}:*",
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.log_discord_api_to_lambda}:*",
         "Effect" : "Allow"
       }
     ]
@@ -79,7 +117,7 @@ resource "aws_iam_policy" "lambda_send_sqs_message" {
       {
         "Effect" : "Allow",
         "Action" : "sqs:SendMessage",
-        "Resource" : "${var.sqs_arn}"
+        "Resource" : "${aws_sqs_queue.default_queue.arn}"
       }
     ]
   })
