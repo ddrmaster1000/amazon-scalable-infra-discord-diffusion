@@ -18,8 +18,8 @@ variable "discord_application_id" {
   type        = number
 }
 
-variable "discord_application_secret" {
-  description = "Discord application secret. Found in teh Dicscord Developer site"
+variable "discord_bot_secret" {
+  description = "Discord bot secret. Found in the Discord Developer site under 'Bot'"
   type        = string
 }
 

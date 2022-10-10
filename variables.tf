@@ -28,8 +28,8 @@ variable "discord_public_key" {
   type        = string
 }
 
-variable "discord_application_secret" {
-  description = "Discord application secret. Found in teh Dicscord Developer site"
+variable "discord_bot_secret" {
+  description = "Discord Bot secret. Found in the Discord Developer site under 'Bot'"
   type        = string
 }
 

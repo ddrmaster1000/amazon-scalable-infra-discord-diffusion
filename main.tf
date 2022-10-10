@@ -22,7 +22,7 @@ module "discord_ui" {
   region                 = var.region
   discord_application_id = var.discord_application_id
   requests_arn           = aws_lambda_layer_version.requests.arn
-  discord_application_secret = var.discord_application_secret
+  discord_bot_secret = var.discord_bot_secret
 }
 
 # Lambda layers to be used for all Lambda functions
