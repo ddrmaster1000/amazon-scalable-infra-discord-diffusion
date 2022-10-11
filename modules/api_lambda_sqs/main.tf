@@ -49,6 +49,7 @@ resource "aws_lambda_function" "discord_api_to_lambda" {
   filename         = "${path.module}/files/discord_api_gw.zip"
   source_code_hash = data.archive_file.discord_api_to_lambda.output_base64sha256
   runtime          = "python3.8"
+  architectures    = ["arm64"]
   role             = aws_iam_role.discord_api_to_lambda.arn
   handler          = "lambda_function.lambda_handler"
   layers = [

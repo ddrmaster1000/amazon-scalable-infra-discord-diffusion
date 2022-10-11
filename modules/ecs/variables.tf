@@ -1,0 +1,14 @@
+variable "project_id" {
+  description = "Overall project name"
+  type        = string
+}
+
+variable "region" {
+  description = "AWS region to build infrastructure"
+  type        = string
+}
+
+variable "vpc_id" {
+  description = "Pre-exisiting VPC ARN"
+  type        = string
+}

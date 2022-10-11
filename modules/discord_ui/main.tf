@@ -10,6 +10,7 @@ resource "aws_lambda_function" "discord_ui" {
   filename         = "${path.module}/files/discord_ui.zip"
   source_code_hash = data.archive_file.discord_ui.output_base64sha256
   runtime          = "python3.8"
+  architectures    = ["arm64"]
   role             = aws_iam_role.discord_ui.arn
   handler          = "lambda_function.lambda_handler"
   layers           = [var.requests_arn]

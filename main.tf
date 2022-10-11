@@ -22,18 +22,29 @@ module "discord_ui" {
   region                 = var.region
   discord_application_id = var.discord_application_id
   requests_arn           = aws_lambda_layer_version.requests.arn
-  discord_bot_secret = var.discord_bot_secret
+  discord_bot_secret     = var.discord_bot_secret
+}
+
+# The ECS cluster with GPUs
+module "ecs_cluster" {
+  source     = "./modules/ecs"
+  project_id = local.unique_project
+  region     = var.region
+  vpc_id     = var.vpc_id
+
 }
 
 # Lambda layers to be used for all Lambda functions
 resource "aws_lambda_layer_version" "requests" {
-  filename            = "files/requests_py3p8.zip"
-  layer_name          = "${local.unique_project}-requests"
-  compatible_runtimes = ["python3.8"]
+  filename                 = "files/requests_layer_arm64.zip"
+  layer_name               = "${local.unique_project}-requests"
+  compatible_runtimes      = ["python3.8"]
+  compatible_architectures = ["arm64"]
 }
 
 resource "aws_lambda_layer_version" "pynacl" {
-  filename            = "files/pynacl_py3p8.zip"
-  layer_name          = "${local.unique_project}-pynacl"
-  compatible_runtimes = ["python3.8"]
+  filename                 = "files/pynacl_layer_arm64.zip"
+  layer_name               = "${local.unique_project}-pynacl"
+  compatible_runtimes      = ["python3.8"]
+  compatible_architectures = ["arm64"]
 }
