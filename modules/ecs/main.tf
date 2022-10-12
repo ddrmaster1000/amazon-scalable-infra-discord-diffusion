@@ -2,7 +2,7 @@
 # This assumes you already have ECR setup and the image placed in ECR.
 
 resource "aws_ecs_cluster" "discord" {
-  name = "${var.project_id}"
+  name = var.project_id
 }
 
 data "aws_subnets" "public" {
@@ -17,12 +17,13 @@ data "aws_subnets" "public" {
 }
 
 # EC2 Launch Template with Nvidia drivers and ECS Drivers
+# Make sure your aws config is setup with the region you want to deploy!
 data "aws_ssm_parameter" "ecs_gpu_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended/image_id"
 }
 
 resource "aws_launch_template" "discord_diffusion" {
-  name = "${var.project_id}"
+  name = var.project_id
 
   block_device_mappings {
     device_name = "/dev/xvda"
@@ -41,10 +42,10 @@ resource "aws_launch_template" "discord_diffusion" {
 
   instance_initiated_shutdown_behavior = "terminate"
 
-# # Uncomment this if you are wanting to run spot instances for your GPU instances. Cost savings!
-#   instance_market_options {
-#     market_type = "spot"
-#   }
+  # # Uncomment this if you are wanting to run spot instances for your GPU instances. Cost savings!
+  #   instance_market_options {
+  #     market_type = "spot"
+  #   }
 
   instance_type = "g4dn.xlarge"
 
@@ -73,14 +74,14 @@ resource "aws_security_group" "ecs_discord" {
   description = "Allow TLS inbound traffic"
   vpc_id      = var.vpc_id
 
-# # Be descriptive on the cidr_blocks of your ip address if you want to uncomment.
-#   ingress {
-#     description      = "SSH"
-#     from_port        = 22
-#     to_port          = 22
-#     protocol         = "tcp"
-#     cidr_blocks      = ["0.0.0.0/0"]
-#   }
+  # # Be descriptive on the cidr_blocks of your ip address if you want to uncomment.
+  #   ingress {
+  #     description      = "SSH"
+  #     from_port        = 22
+  #     to_port          = 22
+  #     protocol         = "tcp"
+  #     cidr_blocks      = ["0.0.0.0/0"]
+  #   }
 
   egress {
     from_port        = 0
@@ -95,21 +96,21 @@ resource "aws_security_group" "ecs_discord" {
 resource "aws_iam_role" "ecs_discord" {
   name = "DiscordECS-${var.project_id}"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "ec2.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ec2.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
     ]
   })
 }
 
 resource "aws_iam_instance_profile" "ecs_discord" {
-  name = "test_profile"
+  name = "ECS-Discord"
   role = aws_iam_role.ecs_discord.name
 }
 
@@ -130,6 +131,151 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" 
   role       = aws_iam_role.ecs_discord.name
   policy_arn = data.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
 }
+
+# ECS Task
+resource "aws_iam_role" "ecs_execution" {
+  name = "ecsExecution-${var.project_id}"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+data "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
+  arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {
+  role       = aws_iam_role.ecs_execution.name
+  policy_arn = data.aws_iam_policy.AmazonECSTaskExecutionRolePolicy.arn
+}
+
+resource "aws_iam_role" "ecs_task_role" {
+  name = "ecsTask-${var.project_id}"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "ecs-tasks.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole_ECS" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = data.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
+}
+
+
+resource "aws_ecs_task_definition" "ecs_task" {
+  # family                = "test"
+  family                = var.project_id
+  execution_role_arn    = aws_iam_role.ecs_execution.arn
+  task_role_arn         = aws_iam_role.ecs_task_role.arn
+  requires_compatibilities = ["EC2"]
+  network_mode = "bridge"
+  container_definitions = <<TASK_DEFINITION
+  [
+    {
+        "name": "${var.project_id}",
+        "image": "${var.image_id}",
+        "cpu": 4096,
+        "memory": 12288,
+        "links": [],
+        "portMappings": [],
+        "essential": true,
+        "entryPoint": [],
+        "command": [],
+        "environment": [
+            {
+                "name": "SQSQUEUEURL",
+                "value": "${var.sqs_queue_url}"
+            },
+            {
+                "name": "REGION",
+                "value": "${var.region}"
+            }
+        ],
+        "environmentFiles": [],
+        "mountPoints": [],
+        "volumesFrom": [],
+        "secrets": [],
+        "dnsServers": [],
+        "dnsSearchDomains": [],
+        "extraHosts": [],
+        "dockerSecurityOptions": [],
+        "dockerLabels": {},
+        "ulimits": [],
+        "systemControls": [],
+        "resourceRequirements": [
+            {
+                "value": "1",
+                "type": "GPU"
+            }
+        ]
+    }
+  ]
+  TASK_DEFINITION
+
+  depends_on = [
+    aws_iam_role.ecs_task_role,
+    aws_iam_role.ecs_execution
+  ]
+}
+
+#     "taskRoleArn": "${aws_iam_role.ecs_task_role.arn}",
+#     "executionRoleArn": "${aws_iam_role.ecs_execution.arn}",
+#     "networkMode": "bridge",
+#     "volumes": [],
+#     "status": "ACTIVE",
+#     "requiresAttributes": [
+#         {
+#             "name": "com.amazonaws.ecs.capability.ecr-auth"
+#         },
+#         {
+#             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
+#         },
+#         {
+#             "name": "com.amazonaws.ecs.capability.task-iam-role"
+#         },
+#         {
+#             "name": "ecs.capability.execution-role-ecr-pull"
+#         },
+#         {
+#             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
+#         }
+#     ],
+#     "placementConstraints": [],
+#     "compatibilities": [
+#         "EXTERNAL",
+#         "EC2"
+#     ],
+#     "requiresCompatibilities": [
+#         "EC2"
+#     ],
+#     "cpu": "4096",
+#     "memory": "12288",
+#     "runtimePlatform": {
+#         "cpuArchitecture": "X86_64",
+#         "operatingSystemFamily": "LINUX"
+#     }
+# }
+
 
 # resource "aws_ecs_cluster_capacity_providers" "discord" {
 #   cluster_name = aws_ecs_cluster.discord.name

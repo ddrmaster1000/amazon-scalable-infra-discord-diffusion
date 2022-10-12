@@ -6,11 +6,11 @@ locals {
 
 # Create the SQS Queue
 resource "aws_sqs_queue" "default_queue" {
-  name_prefix                = var.project_id
-  visibility_timeout_seconds = 120
-  max_message_size           = 262144
-  receive_wait_time_seconds  = 20
-  sqs_managed_sse_enabled = true
+  name_prefix                 = var.project_id
+  visibility_timeout_seconds  = 120
+  max_message_size            = 262144
+  receive_wait_time_seconds   = 20
+  sqs_managed_sse_enabled     = true
   fifo_queue                  = true
   content_based_deduplication = true
 }
@@ -18,7 +18,7 @@ resource "aws_sqs_queue" "default_queue" {
 ### API Gateway ###
 resource "aws_apigatewayv2_api" "discord_gw" {
   name          = "discord-diffusion"
-  description = "HTTP Gateway for Discord Requests"
+  description   = "HTTP Gateway for Discord Requests"
   protocol_type = "HTTP"
   cors_configuration {
     allow_headers = ["*"]
@@ -26,7 +26,7 @@ resource "aws_apigatewayv2_api" "discord_gw" {
     allow_origins = ["https://discord.com"]
   }
   ## Note: payload_format_version must be version 2.0 for this project
-  target = aws_lambda_function.discord_api_to_lambda.arn
+  target    = aws_lambda_function.discord_api_to_lambda.arn
   route_key = "POST /"
   depends_on = [
     aws_lambda_function.discord_api_to_lambda
@@ -34,11 +34,11 @@ resource "aws_apigatewayv2_api" "discord_gw" {
 }
 
 resource "aws_lambda_permission" "apigw" {
-	action        = "lambda:InvokeFunction"
-	function_name = aws_lambda_function.discord_api_to_lambda.arn
-	principal     = "apigateway.amazonaws.com"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.discord_api_to_lambda.arn
+  principal     = "apigateway.amazonaws.com"
 
-	source_arn = "${aws_apigatewayv2_api.discord_gw.execution_arn}/*/*"
+  source_arn = "${aws_apigatewayv2_api.discord_gw.execution_arn}/*/*"
 }
 
 

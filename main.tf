@@ -27,10 +27,24 @@ module "discord_ui" {
 
 # The ECS cluster with GPUs
 module "ecs_cluster" {
-  source     = "./modules/ecs"
+  source        = "./modules/ecs"
+  project_id    = local.unique_project
+  region        = var.region
+  vpc_id        = var.vpc_id
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  image_id      = var.image_id
+  depends_on = [
+    module.api_gw_lambda
+  ]
+}
+
+# Alarms for scaling, and Lambda for pushing custom Metrics to CloudWatch
+module "metrics_scaling" {
+  source     = "./modules/scaling_alarm_lambda"
   project_id = local.unique_project
   region     = var.region
   vpc_id     = var.vpc_id
+  account_id = data.aws_caller_identity.current.account_id
 
 }
 

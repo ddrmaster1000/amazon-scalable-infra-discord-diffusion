@@ -1,6 +1,6 @@
 variable "account_id" {
   description = "AWS Account id"
-  type          = string
+  type        = string
 }
 
 variable "project_id" {
@@ -25,5 +25,5 @@ variable "discord_bot_secret" {
 
 variable "requests_arn" {
   description = "Lambda Layer request's arn"
-  type = string
+  type        = string
 }

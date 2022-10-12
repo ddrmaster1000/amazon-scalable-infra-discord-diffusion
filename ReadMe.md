@@ -8,7 +8,11 @@ Best practice to store secret by commandline at a minimum. Never has it as plain
 
 After running ```terraform apply```, copy the output of ```discord_interactions_endpoint_url``` to the discord Interactions Endpoint URL on the General Information page of your Discord Application. Click 'Save'. 
 
+
 There is an assumption that ECR is already created with the image pushed to the ECR registry. Make sure you keep the ECR in the same region as ECS to have cost savings related to cross region data transfer.
+
+## Gotchas
+Make sure that your aws config command is setup in the region you want to deploy. This is to allow terraform to pull the right ami to be used in a ec2 template. 
 ## TODO: Here we explain how to build an image, and push it to ECR.
 
 # Architecture

@@ -3,6 +3,10 @@ output "discord_interactions_endpoint_url" {
 }
 
 output "ami" {
-  value = module.ecs_cluster.ami
+  value     = module.ecs_cluster.ami
   sensitive = true
+}
+
+output "project_id" {
+  value = local.unique_project
 }

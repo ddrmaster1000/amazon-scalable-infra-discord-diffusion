@@ -38,3 +38,8 @@ variable "vpc_id" {
   type        = string
 }
 
+variable "image_id" {
+  description = "Pre-exisiting private ECR in the same region, with path to image that will be run in the ECS Task"
+  type        = string
+}
+
