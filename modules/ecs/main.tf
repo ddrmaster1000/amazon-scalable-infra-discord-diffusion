@@ -189,7 +189,11 @@ resource "aws_ecs_task_definition" "ecs_task" {
   task_role_arn            = aws_iam_role.ecs_task_role.arn
   requires_compatibilities = ["EC2"]
   network_mode             = "bridge"
-  container_definitions    = <<TASK_DEFINITION
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture = "X86_64"
+  }
+  container_definitions = <<TASK_DEFINITION
   [
     {
         "name": "${var.project_id}",
