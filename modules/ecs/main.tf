@@ -184,12 +184,12 @@ resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole_ECS" {
 
 resource "aws_ecs_task_definition" "ecs_task" {
   # family                = "test"
-  family                = var.project_id
-  execution_role_arn    = aws_iam_role.ecs_execution.arn
-  task_role_arn         = aws_iam_role.ecs_task_role.arn
+  family                   = var.project_id
+  execution_role_arn       = aws_iam_role.ecs_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
   requires_compatibilities = ["EC2"]
-  network_mode = "bridge"
-  container_definitions = <<TASK_DEFINITION
+  network_mode             = "bridge"
+  container_definitions    = <<TASK_DEFINITION
   [
     {
         "name": "${var.project_id}",
