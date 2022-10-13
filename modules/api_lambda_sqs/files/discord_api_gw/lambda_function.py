@@ -5,6 +5,7 @@ from nacl.exceptions import BadSignatureError
 import os
 import boto3
 import requests
+import random
 
 lambda_client = boto3.client('lambda')
 # Create SQS client
@@ -58,7 +59,7 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
         QueueUrl=QUEUE_URL,
         MessageAttributes=MyMessageAttributes,
         MessageBody=json.dumps(MyMessageAttributes),
-        MessageGroupId='NotApplicable'
+        MessageGroupId=f'{user_id}{random.randint(0,99999))}'
     )
     print(response['MessageId'])
 
@@ -111,8 +112,7 @@ def lambda_handler(event, context):
     
     # Collect customer data
     info = json.loads(event.get("body"))
-    print("info")
-    print(info)
+    # print(info)
     customer_data = getCustomerData(info)
     
     # Trigger async lambda for picture generation
