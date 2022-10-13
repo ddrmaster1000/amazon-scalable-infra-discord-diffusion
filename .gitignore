@@ -3,4 +3,3 @@ files/*.zip
 terraform.tfstate
 terraform.tfstate.backup
 .DS_Store
-modules/*/files/*.zip
