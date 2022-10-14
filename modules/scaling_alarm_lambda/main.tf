@@ -155,7 +155,7 @@ data "aws_subnets" "public" {
 
 ### Step Function ###
 resource "aws_sfn_state_machine" "sfn_state_machine" {
-  name     = "${var.project_id}"
+  name     = var.project_id
   role_arn = aws_iam_role.step_function.arn
   type     = "EXPRESS"
 
@@ -326,19 +326,19 @@ resource "aws_iam_policy" "step_lambda" {
   description = "IAM policy for running lambda for step function"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "lambda:InvokeFunction"
-            ],
-            "Resource": [
-                "${aws_lambda_function.lamdba_cw_metric.arn}"
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "${aws_lambda_function.lamdba_cw_metric.arn}"
+        ]
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_policy" "step_xray" {
@@ -347,22 +347,22 @@ resource "aws_iam_policy" "step_xray" {
   description = "IAM policy for logging via xray"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "xray:PutTraceSegments",
-                "xray:PutTelemetryRecords",
-                "xray:GetSamplingRules",
-                "xray:GetSamplingTargets"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets"
+        ],
+        "Resource" : [
+          "*"
+        ]
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "step_lambda" {
@@ -388,7 +388,7 @@ resource "aws_cloudwatch_event_target" "discord_cw" {
   rule      = aws_cloudwatch_event_rule.discord_cw.name
   target_id = "TriggerStepCWMetric"
   arn       = aws_sfn_state_machine.sfn_state_machine.arn
-  role_arn = aws_iam_role.event_rule.arn
+  role_arn  = aws_iam_role.event_rule.arn
 }
 
 resource "aws_iam_role" "event_rule" {
@@ -413,19 +413,19 @@ resource "aws_iam_policy" "event_rule" {
   description = "IAM policy for triggering step function"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "states:StartExecution"
-            ],
-            "Resource": [
-                "${aws_sfn_state_machine.sfn_state_machine.arn}",
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "states:StartExecution"
+        ],
+        "Resource" : [
+          "${aws_sfn_state_machine.sfn_state_machine.arn}",
+        ]
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "event_rule" {

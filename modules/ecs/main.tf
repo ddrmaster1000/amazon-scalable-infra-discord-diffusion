@@ -191,7 +191,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
   network_mode             = "bridge"
   runtime_platform {
     operating_system_family = "LINUX"
-    cpu_architecture = "X86_64"
+    cpu_architecture        = "X86_64"
   }
   container_definitions = <<TASK_DEFINITION
   [
@@ -254,7 +254,7 @@ resource "aws_ecs_service" "discord_diffusion" {
     field = "instanceId"
   }
   deployment_circuit_breaker {
-    enable = true
+    enable   = true
     rollback = true
   }
 }
