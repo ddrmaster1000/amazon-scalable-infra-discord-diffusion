@@ -59,7 +59,7 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
         QueueUrl=QUEUE_URL,
         MessageAttributes=MyMessageAttributes,
         MessageBody=json.dumps(MyMessageAttributes),
-        MessageGroupId=f'{user_id}{random.randint(0,99999))}'
+        MessageGroupId=f'{user_id}{random.randint(0,99999)}'
     )
     print(response['MessageId'])
 

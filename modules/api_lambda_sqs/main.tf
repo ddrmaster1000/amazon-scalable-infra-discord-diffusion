@@ -6,7 +6,7 @@ locals {
 
 # Create the SQS Queue
 resource "aws_sqs_queue" "default_queue" {
-  name_prefix                 = var.project_id
+  name                 = "${var.project_id}.fifo"
   visibility_timeout_seconds  = 120
   max_message_size            = 262144
   receive_wait_time_seconds   = 20

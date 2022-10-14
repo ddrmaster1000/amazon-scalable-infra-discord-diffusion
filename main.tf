@@ -45,7 +45,11 @@ module "metrics_scaling" {
   region     = var.region
   vpc_id     = var.vpc_id
   account_id = data.aws_caller_identity.current.account_id
-
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  depends_on = [
+    module.ecs_cluster,
+    module.api_gw_lambda
+  ]
 }
 
 # Lambda layers to be used for all Lambda functions

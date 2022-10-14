@@ -242,6 +242,23 @@ resource "aws_ecs_task_definition" "ecs_task" {
   ]
 }
 
+### ECS Service ###
+resource "aws_ecs_service" "discord_diffusion" {
+  name            = var.project_id
+  cluster         = aws_ecs_cluster.discord.id
+  task_definition = aws_ecs_task_definition.ecs_task.arn
+  desired_count   = 0
+
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
+  }
+  deployment_circuit_breaker {
+    enable = true
+    rollback = true
+  }
+}
+
 #     "taskRoleArn": "${aws_iam_role.ecs_task_role.arn}",
 #     "executionRoleArn": "${aws_iam_role.ecs_execution.arn}",
 #     "networkMode": "bridge",

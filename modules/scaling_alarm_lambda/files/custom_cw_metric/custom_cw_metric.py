@@ -31,8 +31,12 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
         if response['services'][service_i]['serviceName'] == service_name:
             service_num = service_i
             break
-    running_task_count = int(response['services'][service_num]['runningCount'])
-    print(f"Running Task: {running_task_count}")
+    try:    
+        running_task_count = int(response['services'][service_num]['runningCount'])
+        print(f"Running Task: {running_task_count}")
+    except IndexError:
+        running_task_count = 0
+        print("[WARNING]: Service is not available, defaulting Task to 0.")
     message_count = sqs_client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=['ApproximateNumberOfMessages', 'ApproximateNumberOfMessagesNotVisible'])
     datapoint_for_sqs_attribute = int(message_count['Attributes']['ApproximateNumberOfMessages']) + int(message_count['Attributes']['ApproximateNumberOfMessagesNotVisible'])
     
