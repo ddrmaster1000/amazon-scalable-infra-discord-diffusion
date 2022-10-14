@@ -49,8 +49,8 @@ resource "aws_launch_template" "discord_diffusion" {
 
   instance_type = "g4dn.xlarge"
 
-  key_name = var.project_id
-  # toset(data.aws_subnets.public.ids)
+  # If you want to ssh/login to your instances, reference your key pair here.
+  # key_name = "YOUR KEY PAIR HERE"
   vpc_security_group_ids = [aws_security_group.ecs_discord.id]
 
   user_data = base64encode(
