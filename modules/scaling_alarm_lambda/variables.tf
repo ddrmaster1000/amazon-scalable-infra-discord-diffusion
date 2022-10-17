@@ -22,3 +22,8 @@ variable "sqs_queue_url" {
   description = "SQS Queue URL"
   type        = string
 }
+
+variable "asg_name" {
+  description = "AutoScaler Group Name"
+  type        = string
+}

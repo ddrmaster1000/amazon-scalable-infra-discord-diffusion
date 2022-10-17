@@ -150,4 +150,3 @@ resource "aws_iam_role_policy_attachment" "discord_api_to_lambda_sqs" {
   role       = aws_iam_role.discord_api_to_lambda.name
   policy_arn = aws_iam_policy.lambda_send_sqs_message.arn
 }
-

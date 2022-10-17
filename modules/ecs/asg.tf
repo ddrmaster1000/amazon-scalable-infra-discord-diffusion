@@ -26,19 +26,6 @@ resource "aws_autoscaling_group" "asg" {
 # }
 
 
-resource "aws_autoscaling_policy" "scale_up" {
-  name = "scale-up-${var.project_id}"
-  autoscaling_group_name = aws_autoscaling_group.asg.name
-  adjustment_type = "ChangeInCapacity"
-  policy_type = "StepScaling"
-
-  step_adjustment {
-    scaling_adjustment          = 1
-    metric_interval_lower_bound = 1.0
-  }
-}
-
-
 # ## TODO: IDK what terrible person made step scaling so confusing. They suck.
 # resource "aws_appautoscaling_target" "ecs_target" {
 #   max_capacity       = 5
