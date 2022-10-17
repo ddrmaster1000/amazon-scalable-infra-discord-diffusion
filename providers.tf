@@ -13,7 +13,7 @@ provider "aws" {
   default_tags {
     tags = {
       auto-delete = "no"
-      Project     = "discord-diffusion"
+      Project     = var.project_id
     }
   }
 }

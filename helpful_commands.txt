@@ -1,5 +1,5 @@
 terraform init
-terraform fmt
+terraform fmt --recursive
 terraform validate
 terraform apply
 terraform show
