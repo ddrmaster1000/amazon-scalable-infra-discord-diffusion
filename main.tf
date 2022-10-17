@@ -40,13 +40,13 @@ module "ecs_cluster" {
 
 # Alarms for scaling, and Lambda for pushing custom Metrics to CloudWatch
 module "metrics_scaling" {
-  source           = "./modules/scaling_alarm_lambda"
-  project_id       = local.unique_project
-  region           = var.region
-  vpc_id           = var.vpc_id
-  account_id       = data.aws_caller_identity.current.account_id
-  sqs_queue_url    = module.api_gw_lambda.sqs_queue_url
-  asg_name         = module.ecs_cluster.asg_name
+  source        = "./modules/scaling_alarm_lambda"
+  project_id    = local.unique_project
+  region        = var.region
+  vpc_id        = var.vpc_id
+  account_id    = data.aws_caller_identity.current.account_id
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  asg_name      = module.ecs_cluster.asg_name
   depends_on = [
     module.ecs_cluster,
     module.api_gw_lambda

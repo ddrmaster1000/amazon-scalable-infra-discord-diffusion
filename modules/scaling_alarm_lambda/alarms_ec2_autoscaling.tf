@@ -37,11 +37,11 @@ resource "aws_cloudwatch_metric_alarm" "scale_up" {
 
 ### EC2 Auto-Scaling Policy ###
 resource "aws_autoscaling_policy" "scale_up" {
-  name                      = "scale-up-${var.project_id}"
-  enabled                   = true
-  autoscaling_group_name    = var.asg_name
-  adjustment_type           = "ChangeInCapacity"
-  policy_type               = "StepScaling"
+  name                   = "scale-up-${var.project_id}"
+  enabled                = true
+  autoscaling_group_name = var.asg_name
+  adjustment_type        = "ChangeInCapacity"
+  policy_type            = "StepScaling"
   step_adjustment {
     scaling_adjustment          = 1
     metric_interval_lower_bound = 0

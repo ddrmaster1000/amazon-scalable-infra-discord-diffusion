@@ -1,6 +1,5 @@
 # ECS Resource
 # This assumes you already have ECR setup and the image placed in ECR.
-
 resource "aws_ecs_cluster" "discord" {
   name = var.project_id
 }

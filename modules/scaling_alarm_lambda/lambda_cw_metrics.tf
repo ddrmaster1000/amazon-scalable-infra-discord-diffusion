@@ -1,6 +1,5 @@
 # Lambda to publish custom CloudWatch Metric. 
 # Metric will be used for Autoscaling ECS Service's Tasks and instances running 
-
 locals {
   log_lamdba_cw_metric = "/aws/lambda/lamdba-cw-metric-${var.project_id}"
 }
