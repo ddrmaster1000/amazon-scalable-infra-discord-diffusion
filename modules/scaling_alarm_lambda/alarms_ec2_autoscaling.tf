@@ -42,7 +42,6 @@ resource "aws_autoscaling_policy" "scale_up" {
   autoscaling_group_name    = var.asg_name
   adjustment_type           = "ChangeInCapacity"
   policy_type               = "StepScaling"
-  estimated_instance_warmup = 600
   step_adjustment {
     scaling_adjustment          = 1
     metric_interval_lower_bound = 0
