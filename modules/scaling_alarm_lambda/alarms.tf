@@ -13,6 +13,9 @@ resource "aws_cloudwatch_metric_alarm" "scale_down" {
   threshold                 = "-1"
   alarm_description         = "This metric monitors the down scaling of EC2s based on Discord requests vs running EC2."
   insufficient_data_actions = []
+  dimensions = {
+    SQS = "${var.project_id}.fifo"
+  }
 }
 
 resource "aws_cloudwatch_metric_alarm" "scale_up" {
@@ -27,5 +30,8 @@ resource "aws_cloudwatch_metric_alarm" "scale_up" {
   threshold                 = "1"
   alarm_description         = "This metric monitors the up scaling of EC2s based on Discord requests vs running EC2."
   insufficient_data_actions = []
+  dimensions = {
+    SQS = "${var.project_id}.fifo"
+  }
 }
 

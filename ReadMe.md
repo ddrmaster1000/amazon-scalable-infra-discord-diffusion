@@ -8,7 +8,7 @@ Best practice to store secret by commandline at a minimum. Never has it as plain
 
 After running ```terraform apply```, copy the output of ```discord_interactions_endpoint_url``` to the discord Interactions Endpoint URL on the General Information page of your Discord Application. Click 'Save'. 
 
-
+In order for EC2 instances to launch, please have subnets in the same region that are public to the internet. Add the Tag to these as ```Tier = Public```
 There is an assumption that ECR is already created with the image pushed to the ECR registry. Make sure you keep the ECR in the same region as ECS to have cost savings related to cross region data transfer.
 
 ## Gotchas
