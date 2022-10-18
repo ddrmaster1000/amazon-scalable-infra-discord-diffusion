@@ -66,6 +66,11 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 4. **ECS uses EC2**:
     * This was necessary as stable-diffusion requires a GPU for processing images in a reasonable time frame. At the current time of writing, there are no serverless options with a GPU. [AWS Fargate does not support GPUs](https://github.com/aws/containers-roadmap/issues/88). AWS Lambda also does not support GPUs.
 
+# Scalability In Mind
+How many requests per second could this infrastructure handle with one deployment? With one deployment of this project and given enough service quota increases, this project could likely handle 150 requests per second, or 388,800,000 requests a month, or 1,555,200,000 images! Side note: :hammer: If you actually run into this to the limit, make a note of it!
+* The limit likely to be hit first is the message throughput of [300 API calls per second](https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/quotas-messages.html) for SQS fifo queues. At any one moment in time there could be a message being sent, and received. Which would be a maximum of 150 messages per second. This could easily be overcome by using High Throughput for FIFO queues, which increases the throughput to 3,000 API calls per second.
+* Lets run the numbers with a High Throughput FIFO queue. ```5000 requests / 20 seconds processing per request = 250 requests per second```. This is due to an ECS limitation of [5,000 Container instances per cluster](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-quotas.html). This gives a maximum of 250 requests per second or 648,000,000 requests a month.
+
 # Future Improvements
 1. This project does not take advantage of Spot instances. I would recommend adding Spot Instances and taking advantage of the savings they provide. Don't forget to check your Service Quotas before using Spot instances for the 'G' Instance class.
 2. This project could make the ECR Private repository.
