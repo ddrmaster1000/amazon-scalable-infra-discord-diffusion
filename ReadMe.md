@@ -38,6 +38,7 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 
 # Gotchas
 1. **Service Limits:** Make sure you have enough vCPU for the 'G' EC2 instances. Put in a [Service Quota Limit Increase](https://console.aws.amazon.com/servicequotas/home) in the region you plan to deploy in if needed.
+2. The project takes ~7 minutes after receiving a message to scale up an instance and get the ECS task running. It takes another minute or so before an instance is ready to start taking requests.
 
 # Architecture Decisions
 1. **ECS EC2 instances are deployed in a public subnet**. 
