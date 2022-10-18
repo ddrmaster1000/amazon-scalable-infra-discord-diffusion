@@ -40,8 +40,10 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 
 # Architecture Decisions
 1. **ECS EC2 instances are deployed in a public subnet**. 
-    * Pros: Paying less for data transfers.
-    * Cons: Less secure
+    * Pros: 
+        * Paying less for data transfers.
+    * Cons: 
+        * Less secure
     * This was done to reduce cost so there would not be a NAT Gateway. A NAT Gateway that runs $0.045 per hour and adds $0.045 per GB processed. The NAT Gateway is not a huge expense considering g4dn.xlarge run around 50 cents an hour. But when running one instance for a maximum of 4 hours a day, the NAT Gateway charges do make somewhat of an impact.
 2. **All of the code is packaged into a relatively large 14GB container**. 
     * Pros: 
