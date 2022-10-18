@@ -78,4 +78,5 @@ How many requests per second could this infrastructure handle with one deploymen
 3. There is always something to improve for someone's use case. I do need some time to walk my dogs, pet my cats, and window shop RTX 4090s.
 
 # Thank You
-I want to thank Tahir Saeed for making the draw.io of the Architecture Diagram. 
+Thank you Tahir Saeed for making the draw.io of the Architecture Diagram. 
+Thank you Tom Diepenbrock for the conversion to Express Workflows for the Step Function.
