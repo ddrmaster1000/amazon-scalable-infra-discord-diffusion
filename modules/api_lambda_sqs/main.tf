@@ -1,7 +1,7 @@
 # API Gateway, Discord Lambda handler, and SQS
 locals {
   discord_api_to_lambda     = "lambda-api-${var.project_id}"
-  log_discord_api_to_lambda = "/aws/lambda/${local.discord_api_to_lambda}"
+  cloud_watch_group = "/aws/lambda/${local.discord_api_to_lambda}"
 }
 
 # Create the SQS Queue
@@ -79,7 +79,7 @@ data "archive_file" "discord_api_to_lambda" {
 }
 
 resource "aws_cloudwatch_log_group" "discord_api_to_lambda" {
-  name              = local.log_discord_api_to_lambda
+  name              = local.cloud_watch_group
   retention_in_days = 14
 }
 
@@ -92,16 +92,11 @@ resource "aws_iam_policy" "discord_api_lambda_logging" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Effect" : "Allow",
-        "Action" : "logs:CreateLogGroup",
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:*"
-      },
-      {
         "Action" : [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.log_discord_api_to_lambda}:*",
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.cloud_watch_group}:*",
         "Effect" : "Allow"
       }
     ]

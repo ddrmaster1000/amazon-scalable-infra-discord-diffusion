@@ -6,7 +6,6 @@ output "project_id" {
   value = local.unique_project
 }
 
-# output "ami" {
-#   value     = module.ecs_cluster.ami
-#   sensitive = true
-# }
+output "ecr_registry_id" {
+  value     = module.ecr_image.ecr
+}

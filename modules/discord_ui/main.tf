@@ -1,8 +1,7 @@
 # A Lambda function that creates the Discord UI
 locals {
-  log_discord_ui = "/aws/lambda/discord-ui-${var.project_id}"
+  cloud_watch_group = "/aws/lambda/discord-ui-${var.project_id}"
 }
-
 ### Discord UI ###
 resource "aws_lambda_function" "discord_ui" {
   function_name    = "discord-ui-${var.project_id}"
@@ -19,7 +18,6 @@ resource "aws_lambda_function" "discord_ui" {
       APPLICATION_ID = var.discord_application_id
     }
   }
-
   depends_on = [
     aws_iam_role_policy_attachment.discord_ui_ssm,
     aws_iam_role_policy_attachment.discord_ui_logging,
@@ -41,7 +39,7 @@ data "archive_file" "discord_ui" {
 }
 
 resource "aws_cloudwatch_log_group" "discord_ui" {
-  name              = local.log_discord_ui
+  name              = local.cloud_watch_group
   retention_in_days = 14
 }
 
@@ -54,16 +52,11 @@ resource "aws_iam_policy" "discord_ui" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-        "Effect" : "Allow",
-        "Action" : "logs:CreateLogGroup",
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:*"
-      },
-      {
         "Action" : [
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.log_discord_ui}:*",
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.cloud_watch_group}:*",
         "Effect" : "Allow"
       }
     ]
