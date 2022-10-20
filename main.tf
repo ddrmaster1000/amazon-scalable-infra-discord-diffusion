@@ -7,6 +7,9 @@ module "ecr_image" {
   source                 = "./modules/ecr_image"
   account_id             = data.aws_caller_identity.current.account_id
   project_id             = local.unique_project
+  git_link = var.git_link
+  git_username = var.git_username
+  git_password = var.git_password
 }
 
 # API Gateway, Discord Lambda handler, and SQS
@@ -32,34 +35,34 @@ module "discord_ui" {
   discord_bot_secret     = var.discord_bot_secret
 }
 
-# # The ECS cluster with GPUs
-# module "ecs_cluster" {
-#   source        = "./modules/ecs"
-#   project_id    = local.unique_project
-#   region        = var.region
-#   vpc_id        = var.vpc_id
-#   sqs_queue_url = module.api_gw_lambda.sqs_queue_url
-#   image_id      = var.image_id
-#   depends_on = [
-#     module.api_gw_lambda,
-#     module.ecr_image
-#   ]
-# }
+# The ECS cluster with GPUs
+module "ecs_cluster" {
+  source        = "./modules/ecs"
+  project_id    = local.unique_project
+  region        = var.region
+  vpc_id        = var.vpc_id
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  image_id      = var.image_id
+  depends_on = [
+    module.api_gw_lambda,
+    module.ecr_image
+  ]
+}
 
-# # Alarms for scaling, and Lambda for pushing custom Metrics to CloudWatch
-# module "metrics_scaling" {
-#   source        = "./modules/scaling_alarm_lambda"
-#   project_id    = local.unique_project
-#   region        = var.region
-#   vpc_id        = var.vpc_id
-#   account_id    = data.aws_caller_identity.current.account_id
-#   sqs_queue_url = module.api_gw_lambda.sqs_queue_url
-#   asg_name      = module.ecs_cluster.asg_name
-#   depends_on = [
-#     module.ecs_cluster,
-#     module.api_gw_lambda
-#   ]
-# }
+# Alarms for scaling, and Lambda for pushing custom Metrics to CloudWatch
+module "metrics_scaling" {
+  source        = "./modules/scaling_alarm_lambda"
+  project_id    = local.unique_project
+  region        = var.region
+  vpc_id        = var.vpc_id
+  account_id    = data.aws_caller_identity.current.account_id
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  asg_name      = module.ecs_cluster.asg_name
+  depends_on = [
+    module.ecs_cluster,
+    module.api_gw_lambda
+  ]
+}
 
 # Lambda layers to be used for all Lambda functions
 resource "aws_lambda_layer_version" "requests" {
