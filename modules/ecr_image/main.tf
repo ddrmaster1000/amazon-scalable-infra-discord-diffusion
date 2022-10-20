@@ -2,6 +2,7 @@
 resource "aws_ecr_repository" "ecr" {
   name                 = "${var.project_id}"
   image_tag_mutability = "MUTABLE"
+  force_delete = true
 }
 
 # Clone repo
