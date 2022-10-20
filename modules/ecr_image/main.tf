@@ -13,7 +13,6 @@ resource "null_resource" "git_clone" {
     aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${var.account_id}.dkr.ecr.${var.region}.amazonaws.com
     docker tag discord-diffusion:latest ${aws_ecr_repository.ecr.repository_url}:latest
     docker push ${aws_ecr_repository.ecr.repository_url}:latest
-
     EOT
     interpreter = ["/bin/bash", "-c"]
     working_dir = path.module

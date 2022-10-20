@@ -46,7 +46,6 @@ module "ecs_cluster" {
   image_id      = var.image_id
   depends_on = [
     module.api_gw_lambda,
-    module.ecr_image
   ]
 }
 
