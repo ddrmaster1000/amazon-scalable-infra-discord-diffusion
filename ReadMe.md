@@ -8,16 +8,17 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 2. Create an Amazon Elastic Container Registry (ECR) in the region you will deploy to.
 3. Deploy a Docker image from the project [TODO-MY-GITHUB-HERE]() to that repository.
 4. Tag your public subnets in the region you will deploy into with the tag ```Tier``` | ```Public```.
-5. Fill out the terraform.tfvars and export the Discord Application Secret ```TF_VAR_discord_application_secret``` to your commandline.
+5. Fill out the terraform.tfvars and export the Discord Application Secret ```TF_VAR_discord_bot_secret``` to your commandline.
 
 ## Discord Pre-Work
 1. Create a Discord Application. Look online, there are great resources for this. 
     * Login to the [Discord Developers website](https://discord.com/developers/applications).
     * Create your Discord Application if you have not already. Plenty of great tutorials online.
     * Add your Discord Application to your server or create a server if you do not have one. Plenty of great tutorials online. The minimum permissions needed for generating the URL are ```applications.commands```.
-2. Copy the Discord Application ID and Public key which will be used for the Terraform variables. The Public Key is used for the ```discord_application_secret``` Terraform variable. The ```discord_application_secret``` can be found under your Discord Application -> Bot -> (Enable bot in necessary) -> Token. Feel free to reset the token if you did not take note of it.
+2. Copy the Discord Application ID and Public key which will be used for the Terraform variables. 
+    * The ```discord_bot_secret``` can be found under your Discord Application -> Bot -> (Enable bot in necessary) -> Token. Feel free to reset the token if you did not take note of it.
     * It is best practice to not store secrets in a plain text file that could be picked up by version control system. Below is an example to store a secret on the commandline but feel free to use your own method for securing secrets. 
-    * ```export TF_VAR_discord_application_secret='YOURSECRETHERE'```
+    * ```export discord_bot_secret='YOURSECRETHERE'```
 
 ## Terraform Setup
 1. Setup your commandline with the aws cli. Use ```aws config``` and fill in all the fields. The region selection should be the region you are planning to deploy into. This allows Terraform to pull the right AMI to be used in the EC2 Template generation. 
