@@ -120,3 +120,17 @@ resource "aws_iam_role_policy_attachment" "discord_ui_logging" {
   role       = aws_iam_role.discord_ui.name
   policy_arn = aws_iam_policy.discord_ui.arn
 }
+
+# Run the lambda function once so the user does not need to.
+data "aws_lambda_invocation" "example" {
+  function_name = aws_lambda_function.discord_ui.function_name
+
+  input = <<JSON
+  {
+    "key1": "value1"
+  }
+JSON
+  depends_on = [
+    aws_lambda_function.discord_ui
+  ]
+}
