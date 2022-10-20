@@ -10,6 +10,7 @@ module "ecr_image" {
   git_link = var.git_link
   git_username = var.git_username
   git_password = var.git_password
+  region = var.region
 }
 
 # API Gateway, Discord Lambda handler, and SQS

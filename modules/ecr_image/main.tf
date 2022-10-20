@@ -10,6 +10,10 @@ resource "null_resource" "git_clone" {
     command = <<-EOT
     git clone https://${var.git_username}:${var.git_password}@${var.git_link}
     docker build -t discord-diffusion discord-diffusion/
+    aws ecr get-login-password --region ${var.region} | docker login --username AWS --password-stdin ${var.account_id}.dkr.ecr.${var.region}.amazonaws.com
+    docker tag discord-diffusion:latest ${aws_ecr_repository.ecr.repository_url}:latest
+    docker push ${aws_ecr_repository.ecr.repository_url}:latest
+
     EOT
     interpreter = ["/bin/bash", "-c"]
     working_dir = path.module

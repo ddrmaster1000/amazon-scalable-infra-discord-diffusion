@@ -9,7 +9,7 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 3. Deploy a Docker image from the project [TODO-MY-GITHUB-HERE]() to that repository.
 4. Tag your public subnets in the region you will deploy into with the tag ```Tier``` | ```Public```.
 5. Fill out the terraform.tfvars and export the Discord Application Secret ```TF_VAR_discord_bot_secret``` to your commandline.
-6. Preinstalled Programs: terraform, docker, git.
+6. Preinstalled Programs: [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli), docker, git
 
 ## Discord Pre-Work
 1. Create a Discord Application. Look online, there are great resources for this. 
@@ -22,7 +22,7 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
     * ```export discord_bot_secret='YOURSECRETHERE'```
 
 ## Terraform Setup
-1. Setup your commandline with the aws cli. Use ```aws config``` and fill in all the fields. The region selection should be the region you are planning to deploy into. This allows Terraform to pull the right AMI to be used in the EC2 Template generation. 
+1. Setup your commandline with the aws cli. Use ```aws configure``` and fill in all the fields. The region selection should be the region you are planning to deploy into. This allows Terraform to pull the right AMI to be used in the EC2 Template generation. 
     * Documentation of the [AWS commandline](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) 
 2. Setup your Terraform Variables. The Terraform.tfvars file is provided for you to fill in your variables. If you don't know what to put there, look in the "variables.tf" file in the root directory. It has descriptions there. 
     * It is assumed the user building this project already has a VPC with public subnets. In order for EC2 instances to launch, please have your subnets in the same region that you are deploying to *AND* the subnets are public to the internet. Add the following Tag to these as subnets: Key:```Tier``` and Value:```Public```. Do not add the Key: or Value: wording in the tags. This is just for clarity sake.

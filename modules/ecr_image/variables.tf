@@ -8,6 +8,11 @@ variable "project_id" {
   type        = string
 }
 
+variable "region" {
+  description = "AWS region to build infrastructure"
+  type        = string
+}
+
 variable "git_link" {
   description = "git clone link to repository to turn into an image. WITHOUT https://"
   type        = string
