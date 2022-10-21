@@ -9,7 +9,7 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 3. Deploy a Docker image from the project [TODO-MY-GITHUB-HERE]() to that repository.
 4. Tag your public subnets in the region you will deploy into with the tag ```Tier``` | ```Public```.
 5. Fill out the terraform.tfvars and export the Discord Application Secret ```TF_VAR_discord_bot_secret``` to your commandline.
-6. Preinstalled Programs: [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli), docker, git
+6. Preinstalled Programs: [terraform](https://learn.hashicorp.com/tutorials/terraform/install-cli), docker, git, aws cli
 
 ## Discord Pre-Work
 1. Create a Discord Application. Look online, there are great resources for this. 
