@@ -1,3 +1,0 @@
-output "ecr" {
-  value = aws_ecr_repository.ecr.registry_id
-}

@@ -17,8 +17,3 @@ variable "sqs_queue_url" {
   description = "SQS Queue URL"
   type        = string
 }
-
-variable "image_id" {
-  description = "Image id to be run. This is from ECR in this example"
-  type        = string
-}

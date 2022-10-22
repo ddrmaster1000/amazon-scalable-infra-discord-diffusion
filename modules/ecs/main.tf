@@ -4,6 +4,12 @@ resource "aws_ecs_cluster" "discord" {
   name = var.project_id
 }
 
+resource "aws_ecr_repository" "ecr" {
+  name                 = "${var.project_id}"
+  image_tag_mutability = "MUTABLE"
+  force_delete = true
+}
+
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
@@ -196,7 +202,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
   [
     {
         "name": "${var.project_id}",
-        "image": "${var.image_id}",
+        "image": "${aws_ecr_repository.ecr.repository_url}/${var.project_id}:latest",
         "cpu": 4096,
         "memory": 12288,
         "links": [],

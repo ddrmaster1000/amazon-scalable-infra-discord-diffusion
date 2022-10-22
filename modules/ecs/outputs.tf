@@ -5,3 +5,7 @@ output "ami" {
 output "asg_name" {
   value = aws_autoscaling_group.asg.name
 }
+
+output "ecr_registry_url" {
+  value     = aws_ecr_repository.ecr.repository_url
+}

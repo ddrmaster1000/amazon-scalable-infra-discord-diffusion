@@ -6,6 +6,6 @@ output "project_id" {
   value = local.unique_project
 }
 
-output "ecr_registry_id" {
-  value     = module.ecr_image.ecr
+output "ecr_registry_url" {
+  value     = module.ecs_cluster.ecr_registry_url
 }

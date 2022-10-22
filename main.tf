@@ -2,23 +2,14 @@ locals {
   unique_project = "${var.project_id}-${var.unique_id}"
 }
 
-# ECR and image
-module "ecr_image" {
-  source                 = "./modules/ecr_image"
-  account_id             = data.aws_caller_identity.current.account_id
-  project_id             = local.unique_project
-  git_link = var.git_link
-  git_username = var.git_username
-  git_password = var.git_password
-  region = var.region
-}
+data "aws_region" "current" {}
 
 # API Gateway, Discord Lambda handler, and SQS
 module "api_gw_lambda" {
   source                 = "./modules/api_lambda_sqs"
   account_id             = data.aws_caller_identity.current.account_id
   project_id             = local.unique_project
-  region                 = var.region
+  region                 = data.aws_region.current.name
   discord_application_id = var.discord_application_id
   discord_public_key     = var.discord_public_key
   pynacl_arn             = aws_lambda_layer_version.pynacl.arn
@@ -30,7 +21,7 @@ module "discord_ui" {
   source                 = "./modules/discord_ui"
   account_id             = data.aws_caller_identity.current.account_id
   project_id             = local.unique_project
-  region                 = var.region
+  region                 = data.aws_region.current.name
   discord_application_id = var.discord_application_id
   requests_arn           = aws_lambda_layer_version.requests.arn
   discord_bot_secret     = var.discord_bot_secret
@@ -40,10 +31,9 @@ module "discord_ui" {
 module "ecs_cluster" {
   source        = "./modules/ecs"
   project_id    = local.unique_project
-  region        = var.region
+  region        = data.aws_region.current.name
   vpc_id        = var.vpc_id
   sqs_queue_url = module.api_gw_lambda.sqs_queue_url
-  image_id      = var.image_id
   depends_on = [
     module.api_gw_lambda,
   ]
@@ -53,7 +43,7 @@ module "ecs_cluster" {
 module "metrics_scaling" {
   source        = "./modules/scaling_alarm_lambda"
   project_id    = local.unique_project
-  region        = var.region
+  region        = data.aws_region.current.name
   vpc_id        = var.vpc_id
   account_id    = data.aws_caller_identity.current.account_id
   sqs_queue_url = module.api_gw_lambda.sqs_queue_url

@@ -9,7 +9,6 @@ terraform {
 }
 
 provider "aws" {
-  region = var.region
   default_tags {
     tags = {
       auto-delete = "no"
