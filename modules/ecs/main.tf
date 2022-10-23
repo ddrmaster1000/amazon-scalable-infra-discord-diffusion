@@ -202,7 +202,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
   [
     {
         "name": "${var.project_id}",
-        "image": "${aws_ecr_repository.ecr.repository_url}/${var.project_id}:latest",
+        "image": "${aws_ecr_repository.ecr.repository_url}:latest",
         "cpu": 4096,
         "memory": 12288,
         "links": [],

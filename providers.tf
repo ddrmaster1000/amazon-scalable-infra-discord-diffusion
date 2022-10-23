@@ -12,7 +12,7 @@ provider "aws" {
   default_tags {
     tags = {
       auto-delete = "no"
-      Project     = var.project_id
+      Project     = local.unique_project
     }
   }
 }
