@@ -18,7 +18,7 @@ resource "aws_lambda_function" "lamdba_cw_metric" {
   depends_on = [
     aws_iam_role_policy_attachment.CloudWatchAgentServerPolicy,
     aws_iam_role_policy_attachment.AmazonSQSReadOnlyAccess,
-    aws_iam_role_policy_attachment.describe_ecs_services,
+    aws_iam_role_policy_attachment.describe_ecs_service,
     aws_cloudwatch_log_group.lamdba_cw_metric,
     data.archive_file.lamdba_cw_metric
   ]
@@ -60,17 +60,17 @@ resource "aws_iam_policy" "lambda_cw_metric_lambda_logging" {
   })
 }
 
-resource "aws_iam_policy" "describe_ecs_services" {
+resource "aws_iam_policy" "describe_ecs_service" {
   name        = "describeECSServices-${var.project_id}"
   path        = "/"
-  description = "Describe ECS Services"
+  description = "Describe ECS Service"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
         "Action" : "ecs:DescribeServices",
-        "Resource" : "*"
+        "Resource" : "${var.ecs_service_arn}"
       }
     ]
   })
@@ -111,7 +111,7 @@ resource "aws_iam_role_policy_attachment" "AmazonSQSReadOnlyAccess" {
   policy_arn = data.aws_iam_policy.AmazonSQSReadOnlyAccess.arn
 }
 
-resource "aws_iam_role_policy_attachment" "describe_ecs_services" {
+resource "aws_iam_role_policy_attachment" "describe_ecs_service" {
   role       = aws_iam_role.lamdba_cw_metric.name
-  policy_arn = aws_iam_policy.describe_ecs_services.arn
+  policy_arn = aws_iam_policy.describe_ecs_service.arn
 }

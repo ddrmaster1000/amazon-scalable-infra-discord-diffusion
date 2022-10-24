@@ -48,6 +48,7 @@ module "metrics_scaling" {
   account_id    = data.aws_caller_identity.current.account_id
   sqs_queue_url = module.api_gw_lambda.sqs_queue_url
   asg_name      = module.ecs_cluster.asg_name
+  ecs_service_arn = module.ecs_cluster.ecs_service_arn
   depends_on = [
     module.ecs_cluster,
     module.api_gw_lambda

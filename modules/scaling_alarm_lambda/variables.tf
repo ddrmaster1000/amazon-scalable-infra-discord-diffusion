@@ -27,3 +27,8 @@ variable "asg_name" {
   description = "AutoScaler Group Name"
   type        = string
 }
+
+variable "ecs_service_arn" {
+  description = "ECS Service ARN"
+  type = string
+}
