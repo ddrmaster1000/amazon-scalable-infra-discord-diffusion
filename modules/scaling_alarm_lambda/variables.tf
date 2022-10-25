@@ -35,5 +35,5 @@ variable "asg_arn" {
 
 variable "ecs_service_arn" {
   description = "ECS Service ARN"
-  type = string
+  type        = string
 }

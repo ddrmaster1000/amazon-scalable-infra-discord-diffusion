@@ -20,8 +20,8 @@ resource "aws_cloudwatch_metric_alarm" "scale_down" {
 resource "aws_cloudwatch_metric_alarm" "scale_up" {
   alarm_name                = "scale-up-${var.project_id}"
   comparison_operator       = "GreaterThanOrEqualToThreshold"
-  evaluation_periods        = "9"
-  datapoints_to_alarm       = "9"
+  evaluation_periods        = "15"
+  datapoints_to_alarm       = "15"
   metric_name               = "ScaleAdjustmentTaskCount"
   namespace                 = "SQS Based Scaling Metrics"
   period                    = "10"

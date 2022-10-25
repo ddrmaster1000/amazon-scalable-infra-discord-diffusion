@@ -7,5 +7,5 @@ output "project_id" {
 }
 
 output "ecr_registry_url" {
-  value     = module.ecs_cluster.ecr_registry_url
+  value = module.ecs_cluster.ecr_registry_url
 }

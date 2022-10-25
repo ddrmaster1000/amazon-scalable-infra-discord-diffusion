@@ -11,7 +11,7 @@ output "asg_arn" {
 }
 
 output "ecr_registry_url" {
-  value     = aws_ecr_repository.ecr.repository_url
+  value = aws_ecr_repository.ecr.repository_url
 }
 
 output "ecs_service_arn" {

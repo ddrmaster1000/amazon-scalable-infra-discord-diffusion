@@ -3,7 +3,7 @@
 ### Lambda start from zero ###
 locals {
   log_lamdba_start_from_zero = "/aws/lambda/start-from-zero-${var.project_id}"
-  log_sfn_start_from_zero = "/aws/vendedlogs/states/sfn-start-from-zero-${var.project_id}"
+  log_sfn_start_from_zero    = "/aws/vendedlogs/states/sfn-start-from-zero-${var.project_id}"
 }
 
 # Lambda Function for custom CloudWatch Metrics
@@ -74,31 +74,31 @@ resource "aws_iam_policy" "asg_start_from_zero" {
   path        = "/"
   description = "Describe ECS Service"
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "autoscaling:SetDesiredCapacity",
-            "Resource": "${var.asg_arn}"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "autoscaling:SetDesiredCapacity",
+        "Resource" : "${var.asg_arn}"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role" "lamdba_start_from_zero" {
   name = "start-from-zero-${var.project_id}"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "lambda.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "lambda.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
     ]
-})
+  })
 }
 
 data "aws_iam_policy" "AutoScalingReadOnlyAccess" {
@@ -176,7 +176,7 @@ resource "aws_sfn_state_machine" "zero_state_machine" {
     },
     "Wait": {
       "Type": "Wait",
-      "Seconds": 40,
+      "Seconds": 55,
       "Next": "UpdateService",
       "Comment": "Wait X time for EC2 instance to come online following Lambda and become registered to ECS cluster"
     },
@@ -201,6 +201,11 @@ EOF
     level                  = "ERROR"
   }
 
+  depends_on = [
+    aws_cloudwatch_log_group.sfn_start_from_zero,
+    aws_iam_role_policy_attachment.step_logging_zero
+  ]
+
 }
 
 resource "aws_cloudwatch_log_group" "sfn_start_from_zero" {
@@ -224,6 +229,31 @@ resource "aws_iam_role" "sfn_start_from_zero" {
   })
 }
 
+resource "aws_iam_policy" "step_logging_zero" {
+  name        = "start-from-zero-step-logging-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for logging with a step function"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "logs:CreateLogGroup",
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:*"
+      },
+      {
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.log_sfn_start_from_zero}:*",
+        "Effect" : "Allow"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "step_lambda_zero" {
   name        = "startFromZero-sfn-lambda-${var.project_id}"
   path        = "/"
@@ -232,15 +262,15 @@ resource "aws_iam_policy" "step_lambda_zero" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "lambda:InvokeFunction"
-            ],
-            "Resource": [
-                "${aws_lambda_function.lamdba_start_from_zero.arn}:*"
-            ]
-        },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "${aws_lambda_function.lamdba_start_from_zero.arn}:*"
+        ]
+      },
       {
         "Effect" : "Allow",
         "Action" : [
@@ -260,15 +290,15 @@ resource "aws_iam_policy" "step_update_service_zero" {
   description = "IAM policy for updating an AutoScaling Group's Desired number."
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "ecs:UpdateService",
-            "Resource": "${var.ecs_service_arn}/${var.project_id}"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "ecs:UpdateService",
+        "Resource" : "${var.ecs_service_arn}/${var.project_id}"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_policy" "invoke_lambda_zero" {
@@ -277,19 +307,19 @@ resource "aws_iam_policy" "invoke_lambda_zero" {
   description = "IAM policy for triggering a specific Lamdba function."
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-                {
-            "Effect": "Allow",
-            "Action": [
-                "lambda:InvokeFunction"
-            ],
-            "Resource": [
-                "${aws_lambda_function.lamdba_start_from_zero.arn}"
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeFunction"
+        ],
+        "Resource" : [
+          "${aws_lambda_function.lamdba_start_from_zero.arn}"
+        ]
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "step_lambda_zero" {
@@ -312,6 +342,94 @@ resource "aws_iam_role_policy_attachment" "invoke_lambda_zero" {
   policy_arn = aws_iam_policy.invoke_lambda_zero.arn
 }
 
+resource "aws_iam_role_policy_attachment" "step_logging_zero" {
+  role       = aws_iam_role.sfn_start_from_zero.name
+  policy_arn = aws_iam_policy.step_logging_zero.arn
+}
 
+### Create Alarm for triggering Step Function ###
+resource "aws_cloudwatch_metric_alarm" "start_from_zero" {
+  alarm_name                = "start-from-zero-${var.project_id}"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = "1"
+  datapoints_to_alarm       = "1"
+  metric_name               = "ApproximateNumberOfMessages"
+  namespace                 = "SQS Based Scaling Metrics"
+  period                    = "10"
+  statistic                 = "Average"
+  threshold                 = ".2"
+  alarm_description         = "This metric alarms when there is something in the queue or process in the queue."
+  insufficient_data_actions = []
+  alarm_actions             = []
+  dimensions = {
+    SQS = "${var.project_id}.fifo"
+  }
+}
 
-### Create Alarm for triggering Step Function
+resource "aws_cloudwatch_event_rule" "start_from_zero" {
+  name        = "start-from-zero-${var.project_id}"
+  description = "Run start-from-zero step function when transitioning to ALARM state"
+
+  event_pattern = <<EOF
+{
+  "source": ["aws.cloudwatch"],
+  "detail-type": ["CloudWatch Alarm State Change"],
+  "resources": ["${aws_cloudwatch_metric_alarm.start_from_zero.arn}"],
+  "detail": {
+    "state": {
+      "value": ["ALARM"]
+    }
+  }
+}
+EOF
+}
+
+### Event Bridge Trigger ###
+resource "aws_iam_role" "rule_start_from_zero" {
+  name = "startFromZero-rule-${var.project_id}"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "events.amazonaws.com"
+        },
+        "Effect" : "Allow",
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "start_from_zero_rule" {
+  name        = "startFromZero-rule-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for triggering a specific step function from EventBridge."
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "states:StartExecution"
+        ],
+        "Resource" : [
+          "arn:aws:states:us-west-1:710440188130:stateMachine:start-from-zero-discord-diffusion-dev"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "start_from_zero_rule" {
+  role       = aws_iam_role.rule_start_from_zero.name
+  policy_arn = aws_iam_policy.start_from_zero_rule.arn
+}
+
+resource "aws_cloudwatch_event_target" "start_from_zero_sfn" {
+  rule      = aws_cloudwatch_event_rule.start_from_zero.name
+  role_arn  = aws_iam_role.rule_start_from_zero.arn
+  target_id = "start-from-zero-${var.project_id}"
+  arn       = aws_sfn_state_machine.zero_state_machine.arn
+}

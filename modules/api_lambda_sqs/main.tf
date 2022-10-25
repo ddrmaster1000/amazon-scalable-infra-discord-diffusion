@@ -1,7 +1,7 @@
 # API Gateway, Discord Lambda handler, and SQS
 locals {
-  discord_api_to_lambda     = "lambda-api-${var.project_id}"
-  cloud_watch_group = "/aws/lambda/${local.discord_api_to_lambda}"
+  discord_api_to_lambda = "lambda-api-${var.project_id}"
+  cloud_watch_group     = "/aws/lambda/${local.discord_api_to_lambda}"
 }
 
 # Create the SQS Queue

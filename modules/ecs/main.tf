@@ -5,9 +5,9 @@ resource "aws_ecs_cluster" "discord" {
 }
 
 resource "aws_ecr_repository" "ecr" {
-  name                 = "${var.project_id}"
+  name                 = var.project_id
   image_tag_mutability = "MUTABLE"
-  force_delete = true
+  force_delete         = true
 }
 
 data "aws_subnets" "public" {
