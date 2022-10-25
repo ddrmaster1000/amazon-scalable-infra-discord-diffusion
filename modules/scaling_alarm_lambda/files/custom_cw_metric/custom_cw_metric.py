@@ -32,10 +32,10 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
             service_num = service_i
             break
     try:    
-        running_task_count = int(response['services'][service_num]['runningCount'])
-        print(f"Running Task: {running_task_count}")
+        desired_task_count = int(response['services'][service_num]['desiredCount'])
+        print(f"Running Task: {desired_task_count}")
     except IndexError:
-        running_task_count = 0
+        desired_task_count = 0
         print("[WARNING]: Service is not available, defaulting Task to 0.")
     message_count = sqs_client.get_queue_attributes(QueueUrl=queue_url, AttributeNames=['ApproximateNumberOfMessages', 'ApproximateNumberOfMessagesNotVisible'])
     datapoint_for_sqs_attribute = int(message_count['Attributes']['ApproximateNumberOfMessages']) + int(message_count['Attributes']['ApproximateNumberOfMessagesNotVisible'])
@@ -46,13 +46,13 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
     # Backlog Per Capacity Unit  Queue Size (ApproximateNumberofMessageVisible / Running Capacity of ECS Task Count)
     # """
     # # If no tasks are running, then we having nothing going. We need to scale up.
-    # if running_task_count == 0 and datapoint_for_sqs_attribute > 0:
+    # if desired_task_count == 0 and datapoint_for_sqs_attribute > 0:
     #     backlog_per_capacity_unit = datapoint_for_sqs_attribute
     #     scale_adjustment = 1
     # else:
     # # We have a process running, perform capacity math
     #     try:
-    #         backlog_per_capacity_unit = datapoint_for_sqs_attribute / running_task_count
+    #         backlog_per_capacity_unit = datapoint_for_sqs_attribute / desired_task_count
     #     except ZeroDivisionError as err:
     #         print(f'Handling run-time error: {err}')
     #         backlog_per_capacity_unit = datapoint_for_sqs_attribute
@@ -68,7 +68,7 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
     
     desired_num_tasks = math.ceil(datapoint_for_sqs_attribute/acceptablebacklogpercapacityunit)
     print(f"Desired Number of Taks: {desired_num_tasks}")
-    scale_adjustment = desired_num_tasks - running_task_count
+    scale_adjustment = desired_num_tasks - desired_task_count
     print(f"Scale Number of Tasks: {scale_adjustment}")
 
 
@@ -111,13 +111,13 @@ def putMetricToCW(cw, dimension_name, dimension_value, metric_name, metric_value
 
 if __name__ == "__main__":
     # event = {
-    #     "queueName" : "AssetWriter-IoTWriter-Delete-Queue_DLQ",
-    #     "accountId" : "850526132661",
-    #     "service_name" : "AssetWriter-TeamLatest",
-    #     "cluster_name": "Team-IST-Latest",
-    #     "acceptable_latency" : 300,
-    #     "time_process_per_message" : 0.2
-
+    #   "queueUrl": "https://sqs.us-west-1.amazonaws.com/710440188130/discord-diffusion-dev.fifo",
+    #   "queueName": "discord-diffusion-dev.fifo",
+    #   "accountId": "710440188130",
+    #   "service_name": "discord-diffusion-dev",
+    #   "cluster_name": "discord-diffusion-dev",
+    #   "acceptable_latency": "90",
+    #   "time_process_per_message": "15"
     # }
     # context = []
     lambda_handler(event, context)
