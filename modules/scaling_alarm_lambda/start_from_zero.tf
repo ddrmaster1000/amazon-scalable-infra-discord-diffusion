@@ -176,7 +176,7 @@ resource "aws_sfn_state_machine" "zero_state_machine" {
     },
     "Wait": {
       "Type": "Wait",
-      "Seconds": 40,
+      "Seconds": 55,
       "Next": "UpdateService",
       "Comment": "Wait X time for EC2 instance to come online following Lambda and become registered to ECS cluster"
     },
