@@ -232,6 +232,15 @@ resource "aws_iam_policy" "step_lambda_zero" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": [
+                "${aws_lambda_function.lamdba_start_from_zero.arn}:*"
+            ]
+        },
       {
         "Effect" : "Allow",
         "Action" : [
@@ -256,7 +265,7 @@ resource "aws_iam_policy" "step_update_service_zero" {
         {
             "Effect": "Allow",
             "Action": "ecs:UpdateService",
-            "Resource": "${var.ecs_service_arn}/${var.project_id}/${var.project_id}"
+            "Resource": "${var.ecs_service_arn}/${var.project_id}"
         }
     ]
 })
