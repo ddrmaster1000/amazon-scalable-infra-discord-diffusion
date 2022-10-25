@@ -176,7 +176,7 @@ resource "aws_sfn_state_machine" "zero_state_machine" {
     },
     "Wait": {
       "Type": "Wait",
-      "Seconds": 55,
+      "Seconds": 40,
       "Next": "UpdateService",
       "Comment": "Wait X time for EC2 instance to come online following Lambda and become registered to ECS cluster"
     },
@@ -203,7 +203,8 @@ EOF
 
   depends_on = [
     aws_cloudwatch_log_group.sfn_start_from_zero,
-    aws_iam_role_policy_attachment.step_logging_zero
+    aws_iam_role_policy_attachment.step_logging_zero,
+    aws_iam_role.sfn_start_from_zero
   ]
 
 }
@@ -235,23 +236,25 @@ resource "aws_iam_policy" "step_logging_zero" {
   description = "IAM policy for logging with a step function"
 
   policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Effect" : "Allow",
-        "Action" : "logs:CreateLogGroup",
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:*"
-      },
-      {
-        "Action" : [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:${local.log_sfn_start_from_zero}:*",
-        "Effect" : "Allow"
-      }
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogDelivery",
+                "logs:GetLogDelivery",
+                "logs:UpdateLogDelivery",
+                "logs:DeleteLogDelivery",
+                "logs:ListLogDeliveries",
+                "logs:PutLogEvents",
+                "logs:PutResourcePolicy",
+                "logs:DescribeResourcePolicies",
+                "logs:DescribeLogGroups"
+            ],
+            "Resource": "*"
+        }
     ]
-  })
+})
 }
 
 resource "aws_iam_policy" "step_lambda_zero" {
