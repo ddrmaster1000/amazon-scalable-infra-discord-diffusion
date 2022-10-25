@@ -32,7 +32,7 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
             service_num = service_i
             break
     try:    
-        desired_task_count = int(response['services'][service_num]['desiredCount'])
+        desired_task_count = int(response['services'][service_num]['runningCount']) + int(response['services'][service_num]['pendingCount'])
         print(f"Running Task: {desired_task_count}")
     except IndexError:
         desired_task_count = 0
@@ -67,7 +67,7 @@ def queue_attribute_calculation(cw_client, sqs_client, ecs_client, cluster, serv
     
     
     desired_num_tasks = math.ceil(datapoint_for_sqs_attribute/acceptablebacklogpercapacityunit)
-    print(f"Desired Number of Taks: {desired_num_tasks}")
+    print(f"Desired Number of Tasks: {desired_num_tasks}")
     scale_adjustment = desired_num_tasks - desired_task_count
     print(f"Scale Number of Tasks: {scale_adjustment}")
 
