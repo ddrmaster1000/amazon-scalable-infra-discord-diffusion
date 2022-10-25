@@ -43,7 +43,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     },
     "Wait": {
       "Type": "Wait",
-      "Seconds": 15,
+      "Seconds": 9,
       "Next": "Lambda Invoke (1)"
     },
     "Lambda Invoke (1)": {
@@ -78,7 +78,7 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     },
     "Wait (2)": {
       "Type": "Wait",
-      "Seconds": 15,
+      "Seconds": 9,
       "Next": "Lambda Invoke (2)"
     },
     "Lambda Invoke (2)": {
@@ -113,10 +113,80 @@ resource "aws_sfn_state_machine" "sfn_state_machine" {
     },
     "Wait (1)": {
       "Type": "Wait",
-      "Seconds": 15,
+      "Seconds": 9,
       "Next": "Lambda Invoke (3)"
     },
     "Lambda Invoke (3)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${aws_lambda_function.lamdba_cw_metric.arn}",
+        "Payload": {
+          "queueUrl": "${var.sqs_queue_url}",
+          "queueName": "${var.project_id}.fifo",
+          "accountId": "${var.account_id}",
+          "service_name": "${var.project_id}",
+          "cluster_name": "${var.project_id}",
+          "acceptable_latency": "90",
+          "time_process_per_message": "15"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Wait (3)"
+    },
+    "Wait (3)": {
+      "Type": "Wait",
+      "Seconds": 9,
+      "Next": "Lambda Invoke (4)"
+    },
+    "Lambda Invoke (4)": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "OutputPath": "$.Payload",
+      "Parameters": {
+        "FunctionName": "${aws_lambda_function.lamdba_cw_metric.arn}",
+        "Payload": {
+          "queueUrl": "${var.sqs_queue_url}",
+          "queueName": "${var.project_id}.fifo",
+          "accountId": "${var.account_id}",
+          "service_name": "${var.project_id}",
+          "cluster_name": "${var.project_id}",
+          "acceptable_latency": "90",
+          "time_process_per_message": "15"
+        }
+      },
+      "Retry": [
+        {
+          "ErrorEquals": [
+            "Lambda.ServiceException",
+            "Lambda.AWSLambdaException",
+            "Lambda.SdkClientException"
+          ],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 6,
+          "BackoffRate": 2
+        }
+      ],
+      "Next": "Wait (4)"
+    },
+    "Wait (4)": {
+      "Type": "Wait",
+      "Seconds": 9,
+      "Next": "Lambda Invoke (5)"
+    },
+    "Lambda Invoke (5)": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "OutputPath": "$.Payload",

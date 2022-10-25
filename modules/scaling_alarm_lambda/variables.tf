@@ -24,7 +24,12 @@ variable "sqs_queue_url" {
 }
 
 variable "asg_name" {
-  description = "AutoScaler Group Name"
+  description = "EC2 AutoScaler Group Name"
+  type        = string
+}
+
+variable "asg_arn" {
+  description = "EC2 AutoScaler ARN"
   type        = string
 }
 

@@ -115,7 +115,7 @@ resource "aws_iam_role" "ecs_discord" {
 }
 
 resource "aws_iam_instance_profile" "ecs_discord" {
-  name = "ECS-Discord"
+  name = "ECS-Discord-${var.project_id}"
   role = aws_iam_role.ecs_discord.name
 }
 

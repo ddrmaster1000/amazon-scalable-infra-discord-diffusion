@@ -1,5 +1,5 @@
 project_id             = "discord-diffusion"
-unique_id              = "prod"
-discord_application_id = 1017893876419264532
-discord_public_key     = "a7adfacf070023bc8388d137593d25cfb9ab0023bed6fdfa6feb629ae3ff0498"
-vpc_id                 = "vpc-07a6a766f646a4f55"
+unique_id              = "dev"
+discord_application_id = 1026679548953243660
+discord_public_key     = "743f6ba5346ef9fffbd24c8c55b5b739386c65832c71d3fc1aa509a7ba010f00"
+vpc_id                 = "vpc-0bb816f64e49ccb2f"
