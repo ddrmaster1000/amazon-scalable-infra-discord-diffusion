@@ -252,7 +252,7 @@ resource "aws_ecs_service" "discord_diffusion" {
   name            = var.project_id
   cluster         = aws_ecs_cluster.discord.id
   task_definition = aws_ecs_task_definition.ecs_task.arn
-  desired_count   = 0
+  # desired_count   = 0
 
   ordered_placement_strategy {
     type  = "spread"

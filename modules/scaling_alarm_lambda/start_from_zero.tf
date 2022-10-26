@@ -418,7 +418,7 @@ resource "aws_iam_policy" "start_from_zero_rule" {
           "states:StartExecution"
         ],
         "Resource" : [
-          "arn:aws:states:us-west-1:710440188130:stateMachine:start-from-zero-discord-diffusion-dev"
+          "${aws_sfn_state_machine.zero_state_machine.arn}"
         ]
       }
     ]
