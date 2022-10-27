@@ -32,6 +32,8 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
                 'DataType': 'String',
                 'StringValue': str(customer_data[customer_request])
             }
+    if "negative_prompt" in MyMessageAttributes:
+        MyMessageAttributes['prompt']['StringValue'] = f"{MyMessageAttributes['prompt']['StringValue']}###{MyMessageAttributes['negative_prompt']['StringValue']}"
     MyMessageAttributes.update({
         'interactionId': {
             'DataType': 'String',
@@ -59,7 +61,9 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
         QueueUrl=QUEUE_URL,
         MessageAttributes=MyMessageAttributes,
         MessageBody=json.dumps(MyMessageAttributes),
+        # Each request gets processed randomly
         # MessageGroupId=f'{user_id}{random.randint(0,99999)}'
+        # Each request is processed one at a time for a user. Multiple user requests are processed at once if > 1 machine.
         MessageGroupId=user_id
     )
     print(response['MessageId'])
@@ -91,6 +95,18 @@ def validateRequest(r):
     else:
         print("Success")
     return
+
+def messageResponse(customer_data):
+    message_response = f"\nPrompt: {customer_data['prompt']}"
+    if 'negative_prompt' in customer_data:
+        message_response += f"\nNegative Prompt: {customer_data['negative_prompt']}"
+    if 'seed' in customer_data:
+        message_response += f"\nSeed: {customer_data['seed']}"
+    if 'steps' in customer_data:
+        message_response += f"\nSteps: {customer_data['steps']}"
+    if 'sampler' in customer_data:
+        message_response += f"\nSampler: {customer_data['sampler']}"
+    return message_response
 
 def lambda_handler(event, context):
     print(f"{event}") # debug print
@@ -128,14 +144,14 @@ def lambda_handler(event, context):
     user_id = info['member']['user']['id']
     username = info['member']['user']['username']
     sendSQSMessage(customer_data, it_id,it_token, user_id, username, APPLICATION_ID)
-    
+    message_response = messageResponse(customer_data)
     # Respond to user
     print("Going to return some data!")
     return {
             "type": RESPONSE_TYPES['CHANNEL_MESSAGE_WITH_SOURCE'],
             "data": {
                 "tts": False,
-                "content": f"Submitted to Sparkle:\n{customer_data['prompt']}",
+                "content": f"Submitted to Sparkle```{message_response}```",
                 "embeds": [],
                 "allowed_mentions": { "parse": [] }
             }
