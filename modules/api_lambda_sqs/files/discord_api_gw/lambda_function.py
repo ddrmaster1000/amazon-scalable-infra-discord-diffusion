@@ -56,7 +56,7 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
             'StringValue': str(application_id)
         },
     })
-    print(MyMessageAttributes)
+    # print(MyMessageAttributes)
     response = sqs.send_message(
         QueueUrl=QUEUE_URL,
         MessageAttributes=MyMessageAttributes,
@@ -66,7 +66,8 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
         # Each request is processed one at a time for a user. Multiple user requests are processed at once if > 1 machine.
         MessageGroupId=user_id
     )
-    print(response['MessageId'])
+    # print(response['MessageId'])
+    return MyMessageAttributes
 
 def verify_signature(event):
     raw_body = event.get("body")

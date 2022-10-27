@@ -27,6 +27,16 @@ variable "discord_bot_secret" {
   type        = string
 }
 
+variable "huggingface_username" {
+  description = "Username to the website hugging face. Used to download models."
+  type        = string
+}
+
+variable "huggingface_password" {
+  description = "Password to the website hugging face. Used to download models."
+  type        = string
+}
+
 variable "vpc_id" {
   description = "Pre-exisiting VPC ARN"
   type        = string

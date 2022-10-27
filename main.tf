@@ -29,11 +29,14 @@ module "discord_ui" {
 
 # The ECS cluster with GPUs
 module "ecs_cluster" {
-  source        = "./modules/ecs"
-  project_id    = local.unique_project
-  region        = data.aws_region.current.name
-  vpc_id        = var.vpc_id
-  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  source               = "./modules/ecs"
+  project_id           = local.unique_project
+  account_id           = data.aws_caller_identity.current.account_id
+  region               = data.aws_region.current.name
+  vpc_id               = var.vpc_id
+  sqs_queue_url        = module.api_gw_lambda.sqs_queue_url
+  huggingface_username = var.huggingface_username
+  huggingface_password = var.huggingface_password
   depends_on = [
     module.api_gw_lambda,
   ]

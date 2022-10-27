@@ -142,6 +142,21 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" 
   policy_arn = data.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
 }
 
+# SSM Parameters for hugging face
+resource "aws_ssm_parameter" "username_hg" {
+  name        = "USER_HG"
+  description = "Hugging Face Username"
+  type        = "String"
+  value       = var.huggingface_username
+}
+
+resource "aws_ssm_parameter" "password_hg" {
+  name        = "PASSWORD_HG"
+  description = "Hugging Face Password"
+  type        = "SecureString"
+  value       = var.huggingface_password
+}
+
 # ECS Task
 resource "aws_iam_role" "ecs_execution" {
   name = "ecsExecution-${var.project_id}"
@@ -155,6 +170,31 @@ resource "aws_iam_role" "ecs_execution" {
           "Service" : "ecs-tasks.amazonaws.com"
         },
         "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "ssm_param_hg" {
+  name        = "hg-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for SSM Read user and password Hugging Face"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Decrypt",
+          "ssm:GetParameters",
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:kms:*:${var.account_id}:alias/aws/ssm",
+          "${aws_ssm_parameter.username_hg.arn}",
+          "${aws_ssm_parameter.password_hg.arn}"
+        ]
       }
     ]
   })
@@ -189,6 +229,11 @@ resource "aws_iam_role" "ecs_task_role" {
 resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole_ECS" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = data.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_param_hg" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.ssm_param_hg.arn
 }
 
 ### ECS Task
