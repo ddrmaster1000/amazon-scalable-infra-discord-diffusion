@@ -73,9 +73,8 @@ resource "aws_launch_template" "discord_diffusion" {
     aws_security_group.ecs_discord
   ]
 
-    tags = {
-      Name = "${var.project_id}"
-    }
+  tags = {
+    Name = "${var.project_id}"
   }
 
 }

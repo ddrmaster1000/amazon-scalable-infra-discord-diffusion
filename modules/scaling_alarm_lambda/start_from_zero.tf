@@ -236,25 +236,25 @@ resource "aws_iam_policy" "step_logging_zero" {
   description = "IAM policy for logging with a step function"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogDelivery",
-                "logs:GetLogDelivery",
-                "logs:UpdateLogDelivery",
-                "logs:DeleteLogDelivery",
-                "logs:ListLogDeliveries",
-                "logs:PutLogEvents",
-                "logs:PutResourcePolicy",
-                "logs:DescribeResourcePolicies",
-                "logs:DescribeLogGroups"
-            ],
-            "Resource": "*"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogDelivery",
+          "logs:GetLogDelivery",
+          "logs:UpdateLogDelivery",
+          "logs:DeleteLogDelivery",
+          "logs:ListLogDeliveries",
+          "logs:PutLogEvents",
+          "logs:PutResourcePolicy",
+          "logs:DescribeResourcePolicies",
+          "logs:DescribeLogGroups"
+        ],
+        "Resource" : "*"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_policy" "step_lambda_zero" {
