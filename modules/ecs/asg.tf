@@ -4,6 +4,7 @@ resource "aws_autoscaling_group" "asg" {
   name                      = "asg-${var.project_id}"
   max_size                  = 5
   min_size                  = 0
+  desired_capacity          = 0
   health_check_grace_period = 0
   health_check_type         = "EC2"
   default_cooldown          = 600
