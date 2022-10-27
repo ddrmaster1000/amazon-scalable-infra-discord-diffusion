@@ -72,6 +72,12 @@ resource "aws_launch_template" "discord_diffusion" {
     aws_ecs_cluster.discord,
     aws_security_group.ecs_discord
   ]
+
+    tags = {
+      Name = "${var.project_id}"
+    }
+  }
+
 }
 
 resource "aws_security_group" "ecs_discord" {
