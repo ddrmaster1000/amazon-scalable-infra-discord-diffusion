@@ -4,4 +4,3 @@ terraform.tfstate.backup
 .DS_Store
 modules/*/files/*.zip
 terraform.tfvars
-files/.DS_Store
