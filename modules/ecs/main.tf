@@ -21,6 +21,11 @@ data "aws_subnets" "public" {
   }
 }
 
+data "aws_kms_key" "ebs" {
+  key_id = "alias/aws/ebs"
+}
+
+
 # EC2 Launch Template with Nvidia drivers and ECS Drivers
 # Make sure your aws config is setup with the region you want to deploy!
 data "aws_ssm_parameter" "ecs_gpu_ami" {
@@ -36,6 +41,8 @@ resource "aws_launch_template" "discord_diffusion" {
     ebs {
       volume_size = 40
       volume_type = "gp3"
+      encrypted = true
+      kms_key_id = data.aws_kms_key.ebs.arn
     }
   }
 
@@ -44,7 +51,7 @@ resource "aws_launch_template" "discord_diffusion" {
   }
 
   image_id = data.aws_ssm_parameter.ecs_gpu_ami.value
-
+  update_default_version = true
   instance_initiated_shutdown_behavior = "terminate"
 
   # # Uncomment this if you are wanting to run spot instances for your GPU instances. Cost savings!
