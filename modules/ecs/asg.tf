@@ -2,7 +2,7 @@
 data "aws_default_tags" "current" {}
 resource "aws_autoscaling_group" "asg" {
   name                      = "asg-${var.project_id}"
-  max_size                  = 5
+  max_size                  = 2
   min_size                  = 0
   desired_capacity          = 0
   health_check_grace_period = 0
