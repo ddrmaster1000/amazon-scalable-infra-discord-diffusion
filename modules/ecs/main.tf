@@ -41,8 +41,8 @@ resource "aws_launch_template" "discord_diffusion" {
     ebs {
       volume_size = 40
       volume_type = "gp3"
-      encrypted = true
-      kms_key_id = data.aws_kms_key.ebs.arn
+      encrypted   = true
+      kms_key_id  = data.aws_kms_key.ebs.arn
     }
   }
 
@@ -50,8 +50,8 @@ resource "aws_launch_template" "discord_diffusion" {
     arn = aws_iam_instance_profile.ecs_discord.arn
   }
 
-  image_id = data.aws_ssm_parameter.ecs_gpu_ami.value
-  update_default_version = true
+  image_id                             = data.aws_ssm_parameter.ecs_gpu_ami.value
+  update_default_version               = true
   instance_initiated_shutdown_behavior = "terminate"
 
   # # Uncomment this if you are wanting to run spot instances for your GPU instances. Cost savings!

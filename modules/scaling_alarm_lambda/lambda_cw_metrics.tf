@@ -22,6 +22,18 @@ resource "aws_lambda_function" "lamdba_cw_metric" {
     aws_cloudwatch_log_group.lamdba_cw_metric,
     data.archive_file.lamdba_cw_metric
   ]
+
+  environment {
+    variables = {
+      SQS_QUEUE_NAME   = "${var.project_id}.fifo",
+      SQS_QUEUE_URL    = var.sqs_queue_url,
+      ACCOUNT_ID       = var.account_id,
+      ECS_SERVICE_NAME = var.project_id,
+      ECS_CLUSTER      = var.project_id,
+      LATENCY_SECONDS  = "60",
+      TIME_PER_MESSAGE = "15"
+    }
+  }
 }
 
 data "archive_file" "lamdba_cw_metric" {

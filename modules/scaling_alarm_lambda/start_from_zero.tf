@@ -357,7 +357,7 @@ resource "aws_cloudwatch_metric_alarm" "start_from_zero" {
   evaluation_periods        = "1"
   datapoints_to_alarm       = "1"
   metric_name               = "ApproximateNumberOfMessages"
-  namespace                 = "SQS Based Scaling Metrics"
+  namespace                 = "SQS AutoScaling"
   period                    = "10"
   statistic                 = "Average"
   threshold                 = ".2"
