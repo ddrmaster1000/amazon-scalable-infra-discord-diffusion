@@ -184,7 +184,7 @@ resource "aws_sfn_state_machine" "zero_state_machine" {
       "Type": "Task",
       "End": true,
       "Parameters": {
-        "Service": "${var.project_id}/${var.project_id}",
+        "Service": "${var.project_id}",
         "DesiredCount": 1,
         "Cluster": "${var.project_id}"
       },
@@ -298,7 +298,7 @@ resource "aws_iam_policy" "step_update_service_zero" {
       {
         "Effect" : "Allow",
         "Action" : "ecs:UpdateService",
-        "Resource" : "${var.ecs_service_arn}/${var.project_id}"
+        "Resource" : "${var.ecs_service_arn}"
       }
     ]
   })
