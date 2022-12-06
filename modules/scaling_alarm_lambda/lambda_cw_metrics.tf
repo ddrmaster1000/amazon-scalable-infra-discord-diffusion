@@ -105,22 +105,65 @@ resource "aws_iam_role" "lamdba_cw_metric" {
   })
 }
 
-data "aws_iam_policy" "CloudWatchAgentServerPolicy" {
-  arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+resource "aws_iam_policy" "CloudWatchAgentServerPolicy" {
+  name        = "CloudWatchAgentServerPolicy-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for the custom cloudwatch metrics"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "cloudwatch:PutMetricData",
+        ],
+        "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "logs:DescribeLogGroups",
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup"
+        ],
+        "Resource" : "*"
+      },
+    ]
+  })
 }
 
-data "aws_iam_policy" "AmazonSQSReadOnlyAccess" {
-  arn = "arn:aws:iam::aws:policy/AmazonSQSReadOnlyAccess"
+resource "aws_iam_policy" "AmazonSQSReadOnlyAccess" {
+  name        = "AmazonSQSReadOnlyAccess-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for Read only access to SQS"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueues"
+        ],
+        "Effect" : "Allow",
+        "Resource" : "arn:aws:sqs:${var.region}:${var.account_id}:${var.project_id}.fifo"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "CloudWatchAgentServerPolicy" {
   role       = aws_iam_role.lamdba_cw_metric.name
-  policy_arn = data.aws_iam_policy.CloudWatchAgentServerPolicy.arn
+  policy_arn = resource.aws_iam_policy.CloudWatchAgentServerPolicy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonSQSReadOnlyAccess" {
   role       = aws_iam_role.lamdba_cw_metric.name
-  policy_arn = data.aws_iam_policy.AmazonSQSReadOnlyAccess.arn
+  policy_arn = resource.aws_iam_policy.AmazonSQSReadOnlyAccess.arn
 }
 
 resource "aws_iam_role_policy_attachment" "describe_ecs_service" {

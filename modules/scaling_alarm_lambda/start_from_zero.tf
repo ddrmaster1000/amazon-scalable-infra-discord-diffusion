@@ -101,18 +101,31 @@ resource "aws_iam_role" "lamdba_start_from_zero" {
   })
 }
 
-data "aws_iam_policy" "AutoScalingReadOnlyAccess" {
-  arn = "arn:aws:iam::aws:policy/AutoScalingReadOnlyAccess"
+resource "aws_iam_policy" "AutoScalingReadOnlyAccess" {
+  name        = "AutoScalingReadOnlyAccess-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for Reading an Autoscaling group"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "autoscaling:Describe*",
+        "Resource" : "*"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "AutoScalingReadOnlyAccess" {
   role       = aws_iam_role.lamdba_start_from_zero.name
-  policy_arn = data.aws_iam_policy.AutoScalingReadOnlyAccess.arn
+  policy_arn = resource.aws_iam_policy.AutoScalingReadOnlyAccess.arn
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonSQSReadOnlyAccess_zero" {
   role       = aws_iam_role.lamdba_start_from_zero.name
-  policy_arn = data.aws_iam_policy.AmazonSQSReadOnlyAccess.arn
+  policy_arn = resource.aws_iam_policy.AmazonSQSReadOnlyAccess.arn
 }
 
 resource "aws_iam_role_policy_attachment" "asg_start_from_zero" {

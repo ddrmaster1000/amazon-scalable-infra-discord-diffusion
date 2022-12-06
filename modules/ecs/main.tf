@@ -131,22 +131,86 @@ resource "aws_iam_instance_profile" "ecs_discord" {
   role = aws_iam_role.ecs_discord.name
 }
 
-data "aws_iam_policy" "AWSLambdaSQSQueueExecutionRole" {
-  arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+resource "aws_iam_policy" "AWSLambdaSQSQueueExecutionRole" {
+  name        = "AWSLambdaSQSQueueExecutionRole-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for containers to query SQS queue"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+
+        ],
+        "Resource" : "arn:aws:sqs:${var.region}:${var.account_id}:${var.project_id}.fifo"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
 }
 
-data "aws_iam_policy" "AmazonEC2ContainerServiceforEC2Role" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+resource "aws_iam_policy" "AmazonEC2ContainerServiceforEC2Role" {
+  name        = "AmazonEC2ContainerServiceforEC2Role-${var.project_id}"
+  path        = "/"
+  description = "IAM policy EC2 Container Service Role"
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecs:Poll",
+                "ecs:StartTelemetrySession",
+                "ecr:GetDownloadUrlForLayer",
+                "ecs:UpdateContainerInstancesState",
+                "ecr:BatchGetImage",
+                "ecs:RegisterContainerInstance",
+                "ecs:Submit*",
+                "ecs:DeregisterContainerInstance",
+                "ecr:BatchCheckLayerAvailability"
+            ],
+            "Resource": [
+                "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}",
+                "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.project_id}",
+                "arn:aws:ecs:${var.region}:${var.account_id}:container-instance/${var.project_id}/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecs:DiscoverPollEndpoint",
+                "logs:CreateLogStream",
+                "ec2:DescribeTags",
+                "ecs:CreateCluster",
+                "ecr:GetAuthorizationToken",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole" {
   role       = aws_iam_role.ecs_discord.name
-  policy_arn = data.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
+  policy_arn = resource.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" {
   role       = aws_iam_role.ecs_discord.name
-  policy_arn = data.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
+  policy_arn = resource.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
 }
 
 # SSM Parameters for hugging face
@@ -207,13 +271,39 @@ resource "aws_iam_policy" "ssm_param_hg" {
   })
 }
 
-data "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
-  arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+resource "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
+  name        = "AmazonECSTaskExecutionRolePolicy-${var.project_id}"
+  path        = "/"
+  description = "IAM policy for ECS Task Execution"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+                "ecr:BatchCheckLayerAvailability"
+            ],
+            "Resource": "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "ecr:GetAuthorizationToken",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+})
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {
   role       = aws_iam_role.ecs_execution.name
-  policy_arn = data.aws_iam_policy.AmazonECSTaskExecutionRolePolicy.arn
+  policy_arn = resource.aws_iam_policy.AmazonECSTaskExecutionRolePolicy.arn
 }
 
 resource "aws_iam_role" "ecs_task_role" {
@@ -235,7 +325,7 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole_ECS" {
   role       = aws_iam_role.ecs_task_role.name
-  policy_arn = data.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
+  policy_arn = resource.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_param_hg" {

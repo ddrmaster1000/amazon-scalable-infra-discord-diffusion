@@ -122,7 +122,7 @@ data "aws_lambda_invocation" "example" {
   {
     "key1": "value1"
   }
-JSON
+  JSON
   depends_on = [
     aws_lambda_function.discord_ui,
     aws_ssm_parameter.secret
