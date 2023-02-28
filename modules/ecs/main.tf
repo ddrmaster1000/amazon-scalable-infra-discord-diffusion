@@ -166,39 +166,39 @@ resource "aws_iam_policy" "AmazonEC2ContainerServiceforEC2Role" {
   path        = "/"
   description = "IAM policy EC2 Container Service Role"
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ecs:Poll",
-                "ecs:StartTelemetrySession",
-                "ecr:GetDownloadUrlForLayer",
-                "ecs:UpdateContainerInstancesState",
-                "ecr:BatchGetImage",
-                "ecs:RegisterContainerInstance",
-                "ecs:Submit*",
-                "ecs:DeregisterContainerInstance",
-                "ecr:BatchCheckLayerAvailability"
-            ],
-            "Resource": [
-                "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}",
-                "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.project_id}",
-                "arn:aws:ecs:${var.region}:${var.account_id}:container-instance/${var.project_id}/*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ecs:DiscoverPollEndpoint",
-                "logs:CreateLogStream",
-                "ec2:DescribeTags",
-                "ecs:CreateCluster",
-                "ecr:GetAuthorizationToken",
-                "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ecs:Poll",
+          "ecs:StartTelemetrySession",
+          "ecr:GetDownloadUrlForLayer",
+          "ecs:UpdateContainerInstancesState",
+          "ecr:BatchGetImage",
+          "ecs:RegisterContainerInstance",
+          "ecs:Submit*",
+          "ecs:DeregisterContainerInstance",
+          "ecr:BatchCheckLayerAvailability"
+        ],
+        "Resource" : [
+          "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}",
+          "arn:aws:ecs:${var.region}:${var.account_id}:cluster/${var.project_id}",
+          "arn:aws:ecs:${var.region}:${var.account_id}:container-instance/${var.project_id}/*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ecs:DiscoverPollEndpoint",
+          "logs:CreateLogStream",
+          "ec2:DescribeTags",
+          "ecs:CreateCluster",
+          "ecr:GetAuthorizationToken",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
     ]
   })
 }
@@ -277,28 +277,28 @@ resource "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
   description = "IAM policy for ECS Task Execution"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "ecr:BatchCheckLayerAvailability"
-            ],
-            "Resource": "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogStream",
-                "ecr:GetAuthorizationToken",
-                "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability"
+        ],
+        "Resource" : "arn:aws:ecr:${var.region}:${var.account_id}:repository/${var.project_id}"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "ecr:GetAuthorizationToken",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : "*"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {

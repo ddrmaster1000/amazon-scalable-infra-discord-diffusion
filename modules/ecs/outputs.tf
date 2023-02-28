@@ -14,6 +14,10 @@ output "ecr_registry_url" {
   value = aws_ecr_repository.ecr.repository_url
 }
 
+output "ecr_registry_arn" {
+  value = aws_ecr_repository.ecr.arn
+}
+
 output "ecs_service_arn" {
   value = aws_ecs_service.discord_diffusion.id
 }

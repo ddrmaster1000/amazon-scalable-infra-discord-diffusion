@@ -59,6 +59,23 @@ module "metrics_scaling" {
   ]
 }
 
+# cicd pipeline for the ecr image
+module "pipeline" {
+  source          = "./modules/pipeline"
+  project_id      = local.unique_project
+  region          = data.aws_region.current.name
+  account_id      = data.aws_caller_identity.current.account_id
+  ecr_arn         = module.ecs_cluster.ecr_registry_arn
+  docker_username = var.docker_username
+  git_codebuild   = var.git_codebuild
+  docker_password = var.docker_password
+  depends_on = [
+    module.ecs_cluster,
+    module.api_gw_lambda,
+    module.metrics_scaling
+  ]
+}
+
 # Lambda layers to be used for all Lambda functions
 resource "aws_lambda_layer_version" "requests" {
   filename                 = "files/requests_layer_arm64.zip"

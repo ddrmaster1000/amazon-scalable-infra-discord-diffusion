@@ -41,3 +41,18 @@ variable "vpc_id" {
   description = "Pre-exisiting VPC ARN"
   type        = string
 }
+
+variable "docker_username" {
+  description = "Docker login username"
+  type        = string
+}
+
+variable "docker_password" {
+  description = "Docker login password"
+  type        = string
+}
+
+variable "git_codebuild" {
+  description = "Git clone https url that codebuild uses to build the ecr image"
+  type        = string
+}
