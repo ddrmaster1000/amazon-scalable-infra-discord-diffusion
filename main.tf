@@ -35,8 +35,6 @@ module "ecs_cluster" {
   region               = data.aws_region.current.name
   vpc_id               = var.vpc_id
   sqs_queue_url        = module.api_gw_lambda.sqs_queue_url
-  huggingface_username = var.huggingface_username
-  huggingface_password = var.huggingface_password
   depends_on = [
     module.api_gw_lambda,
   ]

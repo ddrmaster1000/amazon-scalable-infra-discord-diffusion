@@ -370,6 +370,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
 
 resource "aws_ssm_parameter" "sqs_queue" {
   name        = "/discord_diffusion/SQS_QUEUE"
+  type = "String"
   description = "SQS Queue url for ${var.project_id}"
   value       = var.sqs_queue_url
 }

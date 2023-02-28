@@ -30,10 +30,13 @@ resource "aws_iam_policy" "ssm_docker_read" {
           "ssm:GetParameters",
           "ssm:GetParameter"
         ],
-        "Resource" : "arn:aws:${var.region}:${var.account_id}:parameter/CodeBuild/dockerLoginPassword"
+        "Resource" : aws_ssm_parameter.docker_password.arn
       }
     ]
   })
+  depends_on = [
+    aws_ssm_parameter.docker_password
+  ]
 }
 
 resource "aws_iam_policy" "ecr_docker_push" {

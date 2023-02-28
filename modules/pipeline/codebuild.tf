@@ -63,3 +63,9 @@ resource "aws_cloudwatch_log_group" "image_builder" {
   retention_in_days = 7
 }
 
+resource "aws_ssm_parameter" "docker_password" {
+  name        = "/discord_diffusion/dockerLoginPassword"
+  type = "SecureString"
+  description = "Docker Password for ${var.project_id}"
+  value       = var.docker_password
+}

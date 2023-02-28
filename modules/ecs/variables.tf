@@ -22,8 +22,3 @@ variable "sqs_queue_url" {
   description = "SQS Queue URL"
   type        = string
 }
-
-variable "docker_password" {
-  description = "Docker login password"
-  type        = string
-}
