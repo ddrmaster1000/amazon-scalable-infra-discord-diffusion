@@ -37,8 +37,3 @@ variable "git_branch" {
   description = "Which branch should we trigger builds from? ex: dev main"
   type        = string
 }
-
-variable "github_personal_access_token" {
-  description = "Personal access token from Github"
-  type        = string
-}
