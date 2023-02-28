@@ -213,21 +213,6 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerServiceforEC2Role" 
   policy_arn = resource.aws_iam_policy.AmazonEC2ContainerServiceforEC2Role.arn
 }
 
-# SSM Parameters for hugging face
-resource "aws_ssm_parameter" "username_hg" {
-  name        = "USER_HG"
-  description = "Hugging Face Username"
-  type        = "String"
-  value       = var.huggingface_username
-}
-
-resource "aws_ssm_parameter" "password_hg" {
-  name        = "PASSWORD_HG"
-  description = "Hugging Face Password"
-  type        = "SecureString"
-  value       = var.huggingface_password
-}
-
 # ECS Task
 resource "aws_iam_role" "ecs_execution" {
   name = "ecsExecution-${var.project_id}"
@@ -246,10 +231,10 @@ resource "aws_iam_role" "ecs_execution" {
   })
 }
 
-resource "aws_iam_policy" "ssm_param_hg" {
-  name        = "hg-${var.project_id}"
+resource "aws_iam_policy" "ssm_param_ecs" {
+  name        = "ecs-ssm-${var.project_id}"
   path        = "/"
-  description = "IAM policy for SSM Read user and password Hugging Face"
+  description = "IAM policy for SSM Read variables"
 
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -263,8 +248,7 @@ resource "aws_iam_policy" "ssm_param_hg" {
         ],
         "Resource" : [
           "arn:aws:kms:*:${var.account_id}:alias/aws/ssm",
-          "${aws_ssm_parameter.username_hg.arn}",
-          "${aws_ssm_parameter.password_hg.arn}"
+          "${aws_ssm_parameter.sqs_queue.arn}",
         ]
       }
     ]
@@ -328,9 +312,9 @@ resource "aws_iam_role_policy_attachment" "AWSLambdaSQSQueueExecutionRole_ECS" {
   policy_arn = resource.aws_iam_policy.AWSLambdaSQSQueueExecutionRole.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ssm_param_hg" {
+resource "aws_iam_role_policy_attachment" "ssm_param_ecs" {
   role       = aws_iam_role.ecs_task_role.name
-  policy_arn = aws_iam_policy.ssm_param_hg.arn
+  policy_arn = aws_iam_policy.ssm_param_ecs.arn
 }
 
 ### ECS Task
@@ -357,16 +341,6 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "essential": true,
         "entryPoint": [],
         "command": [],
-        "environment": [
-            {
-                "name": "SQSQUEUEURL",
-                "value": "${var.sqs_queue_url}"
-            },
-            {
-                "name": "REGION",
-                "value": "${var.region}"
-            }
-        ],
         "environmentFiles": [],
         "mountPoints": [],
         "volumesFrom": [],
@@ -392,6 +366,12 @@ resource "aws_ecs_task_definition" "ecs_task" {
     aws_iam_role.ecs_task_role,
     aws_iam_role.ecs_execution
   ]
+}
+
+resource "aws_ssm_parameter" "sqs_queue" {
+  name        = "/discord_diffusion/SQS_QUEUE"
+  description = "SQS Queue url for ${var.project_id}"
+  value       = var.sqs_queue_url
 }
 
 ### ECS Service ###

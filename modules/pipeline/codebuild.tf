@@ -52,20 +52,14 @@ resource "aws_codebuild_project" "image_builder" {
 
   source {
     type            = "GITHUB"
-    location        = "https://github.com/ddrmaster1000/amazon-scalable-infra-discord-diffusion.git"
+    location        = "https://github.com/ddrmaster1000/amazon-scalable-discord-diffusion.git"
     git_clone_depth = 1
   }
   source_version = "dev"
 }
 
 resource "aws_cloudwatch_log_group" "image_builder" {
-  name              = "codebuilder/image-builder-${var.project_id}"
+  name              = "codebuilder/${var.project_id}-image-builder"
   retention_in_days = 7
 }
 
-resource "aws_ssm_parameter" "secret" {
-  name        = "/CodeBuild/dockerLoginPassword"
-  description = "Docker login password for the ${var.project_id} project"
-  type        = "SecureString"
-  value       = var.docker_password
-}

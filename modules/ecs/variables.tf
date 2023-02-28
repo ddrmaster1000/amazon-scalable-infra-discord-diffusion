@@ -23,12 +23,7 @@ variable "sqs_queue_url" {
   type        = string
 }
 
-variable "huggingface_username" {
-  description = "Username to the website hugging face. Used to download models."
-  type        = string
-}
-
-variable "huggingface_password" {
-  description = "Password to the website hugging face. Used to download models."
+variable "docker_password" {
+  description = "Docker login password"
   type        = string
 }
