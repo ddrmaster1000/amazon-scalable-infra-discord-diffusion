@@ -126,6 +126,30 @@ resource "aws_iam_policy" "CodeBuildBasePolicy" {
   })
 }
 
+resource "aws_iam_policy" "codebuild_cloudwatch_logs" {
+  name        = "CodeBuildCloudWatchLogsPolicy-${var.project_id}"
+  path        = "/"
+  description = "Push logs to CloudWatch"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Resource": [
+                aws_cloudwatch_log_group.image_builder.arn,
+                "${aws_cloudwatch_log_group.image_builder.arn}:*"
+            ],
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ]
+        }
+    ]
+})
+}
+
 resource "aws_iam_role_policy_attachment" "ssm_docker_read" {
   role       = aws_iam_role.codebuild_image_builder.name
   policy_arn = resource.aws_iam_policy.ssm_docker_read.arn
@@ -139,4 +163,9 @@ resource "aws_iam_role_policy_attachment" "ecr_docker_push" {
 resource "aws_iam_role_policy_attachment" "CodeBuildBasePolicy" {
   role       = aws_iam_role.codebuild_image_builder.name
   policy_arn = resource.aws_iam_policy.CodeBuildBasePolicy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch_logs" {
+  role       = aws_iam_role.codebuild_image_builder.name
+  policy_arn = resource.aws_iam_policy.codebuild_cloudwatch_logs.arn
 }
