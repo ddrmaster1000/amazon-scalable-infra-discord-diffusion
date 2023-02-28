@@ -67,6 +67,7 @@ module "pipeline" {
   docker_username = var.docker_username
   git_codebuild   = var.git_codebuild
   docker_password = var.docker_password
+  github_personal_access_token = var.github_personal_access_token
   depends_on = [
     module.ecs_cluster,
     module.api_gw_lambda,

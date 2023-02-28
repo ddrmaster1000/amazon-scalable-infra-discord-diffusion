@@ -69,3 +69,9 @@ resource "aws_ssm_parameter" "docker_password" {
   description = "Docker Password for ${var.project_id}"
   value       = var.docker_password
 }
+
+resource "aws_codebuild_source_credential" "github" {
+  auth_type   = "PERSONAL_ACCESS_TOKEN"
+  server_type = "GITHUB"
+  token       = var.github_personal_access_token
+}

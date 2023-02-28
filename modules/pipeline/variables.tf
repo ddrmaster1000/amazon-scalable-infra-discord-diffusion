@@ -32,3 +32,8 @@ variable "git_codebuild" {
   description = "Git clone https url that codebuild uses to build the ecr image"
   type        = string
 }
+
+variable "github_personal_access_token" {
+  description = "Personal access token from Github"
+  type        = string
+}
