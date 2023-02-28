@@ -132,22 +132,22 @@ resource "aws_iam_policy" "codebuild_cloudwatch_logs" {
   description = "Push logs to CloudWatch"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Resource": [
-                aws_cloudwatch_log_group.image_builder.arn,
-                "${aws_cloudwatch_log_group.image_builder.arn}:*"
-            ],
-            "Action": [
-                "logs:CreateLogGroup",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents"
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Resource" : [
+          aws_cloudwatch_log_group.image_builder.arn,
+          "${aws_cloudwatch_log_group.image_builder.arn}:*"
+        ],
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "ssm_docker_read" {

@@ -45,8 +45,7 @@ resource "aws_codebuild_project" "image_builder" {
 
   logs_config {
     cloudwatch_logs {
-      group_name  = "codebuild"
-      stream_name = "image-builder-${var.project_id}"
+      group_name = "/aws/codebuild/${var.project_id}-image-builder"
     }
   }
 
@@ -59,17 +58,19 @@ resource "aws_codebuild_project" "image_builder" {
 }
 
 resource "aws_cloudwatch_log_group" "image_builder" {
-  name              = "codebuilder/${var.project_id}-image-builder"
+  name              = "/aws/codebuild/${var.project_id}-image-builder"
   retention_in_days = 7
 }
 
 resource "aws_ssm_parameter" "docker_password" {
   name        = "/discord_diffusion/dockerLoginPassword"
-  type = "SecureString"
+  type        = "SecureString"
   description = "Docker Password for ${var.project_id}"
   value       = var.docker_password
 }
 
+# https://docs.aws.amazon.com/codebuild/latest/userguide/access-tokens.html#access-tokens-github-prereqs : Access your source provider in CodeBuild -  Access token prerequisites
+# Requires a 'Tokens (classic)'. I tried with a 'Fine-Grained Tokens' giving all permissions which did not work. 
 resource "aws_codebuild_source_credential" "github" {
   auth_type   = "PERSONAL_ACCESS_TOKEN"
   server_type = "GITHUB"

@@ -29,12 +29,12 @@ module "discord_ui" {
 
 # The ECS cluster with GPUs
 module "ecs_cluster" {
-  source               = "./modules/ecs"
-  project_id           = local.unique_project
-  account_id           = data.aws_caller_identity.current.account_id
-  region               = data.aws_region.current.name
-  vpc_id               = var.vpc_id
-  sqs_queue_url        = module.api_gw_lambda.sqs_queue_url
+  source        = "./modules/ecs"
+  project_id    = local.unique_project
+  account_id    = data.aws_caller_identity.current.account_id
+  region        = data.aws_region.current.name
+  vpc_id        = var.vpc_id
+  sqs_queue_url = module.api_gw_lambda.sqs_queue_url
   depends_on = [
     module.api_gw_lambda,
   ]
@@ -59,14 +59,15 @@ module "metrics_scaling" {
 
 # cicd pipeline for the ecr image
 module "pipeline" {
-  source          = "./modules/pipeline"
-  project_id      = local.unique_project
-  region          = data.aws_region.current.name
-  account_id      = data.aws_caller_identity.current.account_id
-  ecr_arn         = module.ecs_cluster.ecr_registry_arn
-  docker_username = var.docker_username
-  git_codebuild   = var.git_codebuild
-  docker_password = var.docker_password
+  source                       = "./modules/pipeline"
+  project_id                   = local.unique_project
+  region                       = data.aws_region.current.name
+  account_id                   = data.aws_caller_identity.current.account_id
+  ecr_arn                      = module.ecs_cluster.ecr_registry_arn
+  docker_username              = var.docker_username
+  git_codebuild                = var.git_codebuild
+  git_branch                   = var.git_branch
+  docker_password              = var.docker_password
   github_personal_access_token = var.github_personal_access_token
   depends_on = [
     module.ecs_cluster,
