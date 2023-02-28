@@ -70,8 +70,19 @@ resource "aws_ssm_parameter" "docker_password" {
 
 # https://docs.aws.amazon.com/codebuild/latest/userguide/access-tokens.html#access-tokens-github-prereqs : Access your source provider in CodeBuild -  Access token prerequisites
 # Requires a 'Tokens (classic)'. I tried with a 'Fine-Grained Tokens' giving all permissions which did not work. 
-# resource "aws_codebuild_source_credential" "github" {
-#   auth_type   = "PERSONAL_ACCESS_TOKEN"
-#   server_type = "GITHUB"
-#   token       = var.github_personal_access_token
-# }
+resource "aws_codebuild_source_credential" "github" {
+  auth_type   = "PERSONAL_ACCESS_TOKEN"
+  server_type = "GITHUB"
+  token       = var.github_personal_access_token
+}
+
+resource "aws_codebuild_webhook" "image_builder" {
+  project_name = aws_codebuild_project.image_builder.name
+  build_type   = "BUILD"
+  filter_group {
+    filter {
+      type    = "EVENT"
+      pattern = "PUSH"
+    }
+  }
+}
