@@ -13,7 +13,7 @@
             "name": "negative_prompt",
             "description": "Describe what should not be included in the images",
             "type": 3,
-            "required": "True"
+            "required": "False"
         },
         {
             "name": "seed",
