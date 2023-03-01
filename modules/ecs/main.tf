@@ -62,7 +62,7 @@ resource "aws_launch_template" "discord_diffusion" {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size = 40
+      volume_size = 50
       volume_type = "gp3"
       encrypted   = true
       kms_key_id  = data.aws_kms_key.ebs.arn
