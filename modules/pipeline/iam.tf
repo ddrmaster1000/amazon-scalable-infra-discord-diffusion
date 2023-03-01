@@ -56,7 +56,7 @@ resource "aws_iam_policy" "ecr_docker_push" {
           "ecr:BatchCheckLayerAvailability",
           "ecr:PutImage"
         ],
-        "Resource" : "arn:aws:ecr:${var.region}:${var.account_id}:repository/discord-diffusion-image-builds"
+        "Resource" : var.ecr_arn
       },
       {
         "Effect" : "Allow",
