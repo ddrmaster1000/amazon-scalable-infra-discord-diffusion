@@ -97,7 +97,7 @@
                 },
                 {
                     "name": "Stable Diffusion 2.1",
-                    "value": "stable_diffusion_2.1"
+                    "value": "stable_diffusion_2.1_512"
                 }
             ]
         }
