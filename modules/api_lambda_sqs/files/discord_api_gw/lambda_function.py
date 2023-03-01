@@ -108,7 +108,7 @@ def messageResponse(customer_data):
 
     for internal_var, readable in readable_dict.items():
         if internal_var in customer_data:
-            message_response += f"\{readable}: {customer_data[internal_var]}"
+            message_response += f"{readable}: {customer_data[internal_var]}\n"
     return message_response
 
 def lambda_handler(event, context):
