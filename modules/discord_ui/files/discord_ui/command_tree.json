@@ -5,7 +5,13 @@
     "options": [
         {
             "name": "prompt",
-            "description": "Description of the image to be generated. Required.",
+            "description": "Description of the image to be generated.",
+            "type": 3,
+            "required": "True"
+        },
+        {
+            "name": "negative_prompt",
+            "description": "Describe what should not be included in the images",
             "type": 3,
             "required": "True"
         },

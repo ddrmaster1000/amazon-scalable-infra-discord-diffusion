@@ -32,8 +32,6 @@ def sendSQSMessage(customer_data, it_id, it_token, user_id, username, applicatio
                 'DataType': 'String',
                 'StringValue': str(customer_data[customer_request])
             }
-    if "negative_prompt" in MyMessageAttributes:
-        MyMessageAttributes['prompt']['StringValue'] = f"{MyMessageAttributes['prompt']['StringValue']}###{MyMessageAttributes['negative_prompt']['StringValue']}"
     MyMessageAttributes.update({
         'interactionId': {
             'DataType': 'String',
@@ -98,15 +96,19 @@ def validateRequest(r):
     return
 
 def messageResponse(customer_data):
-    message_response = f"\nPrompt: {customer_data['prompt']}"
-    if 'negative_prompt' in customer_data:
-        message_response += f"\nNegative Prompt: {customer_data['negative_prompt']}"
-    if 'seed' in customer_data:
-        message_response += f"\nSeed: {customer_data['seed']}"
-    if 'steps' in customer_data:
-        message_response += f"\nSteps: {customer_data['steps']}"
-    if 'sampler' in customer_data:
-        message_response += f"\nSampler: {customer_data['sampler']}"
+    # Make the customer request readable
+    message_response = ''
+    readable_dict = {
+        'prompt': 'Prompt',
+        'negative_prompt': 'Negative Prompt',
+        'seed': 'Seed',
+        'steps': 'Steps',
+        'sampler': 'Sampler'
+    }
+
+    for internal_var, readable in readable_dict.items():
+        if internal_var in customer_data:
+            message_response += f"\{readable}: {customer_data[internal_var]}"
     return message_response
 
 def lambda_handler(event, context):
