@@ -103,7 +103,8 @@ def messageResponse(customer_data):
         'negative_prompt': 'Negative Prompt',
         'seed': 'Seed',
         'steps': 'Steps',
-        'sampler': 'Sampler'
+        'sampler': 'Sampler',
+        'model': 'model'
     }
 
     for internal_var, readable in readable_dict.items():

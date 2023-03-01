@@ -84,6 +84,22 @@
                     "value": "k_heun"
                 }
             ]
+        },
+        {
+            "name": "model",
+            "description": "Select a model from the options below. Default is stable diffusion 2.1",
+            "type": 3,
+            "required": "False",
+            "choices": [
+                {
+                    "name": "Realistic Vision",
+                    "value": "Realistic Vision"
+                },
+                {
+                    "name": "Stable Diffusion 2.1",
+                    "value": "stable_diffusion_2.1"
+                }
+            ]
         }
     ]
 }
