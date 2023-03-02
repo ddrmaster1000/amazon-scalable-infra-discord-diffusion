@@ -53,7 +53,7 @@ resource "aws_codebuild_project" "image_builder" {
     location        = "https://github.com/ddrmaster1000/amazon-scalable-discord-diffusion.git"
     git_clone_depth = 1
   }
-  source_version = "dev"
+  source_version = var.git_branch
 }
 
 resource "aws_cloudwatch_log_group" "image_builder" {
