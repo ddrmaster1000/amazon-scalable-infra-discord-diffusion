@@ -291,7 +291,7 @@ resource "aws_iam_policy" "ecslogs" {
         {
             "Effect": "Allow",
             "Action": "logs:PutLogEvents",
-            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:${var.project_id}:log-stream:${var.project_id}"
+            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}:log-stream:${var.project_id}"
         },
         {
             "Effect": "Allow",
@@ -299,7 +299,7 @@ resource "aws_iam_policy" "ecslogs" {
                 "logs:CreateLogStream",
                 "logs:CreateLogGroup"
             ],
-            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:${var.project_id}"
+            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}"
         }
     ]
 })
@@ -411,7 +411,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
             "logDriver": "awslogs",
             "options": {
                 "awslogs-create-group": "true",
-                "awslogs-group": "${var.project_id}",
+                "awslogs-group": "ecs-${var.project_id}",
                 "awslogs-region": "${var.region}",
                 "awslogs-stream-prefix": "${var.project_id}"
             }
@@ -430,6 +430,11 @@ resource "aws_ecs_task_definition" "ecs_task" {
     aws_iam_role.ecs_task_role,
     aws_iam_role.ecs_execution
   ]
+}
+
+resource "aws_cloudwatch_log_group" "ecs_logging" {
+  name = "ecs-${var.project_id}"
+  retention_in_days = 7
 }
 
 resource "aws_ssm_parameter" "sqs_queue" {
