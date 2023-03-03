@@ -278,6 +278,33 @@ resource "aws_iam_policy" "ssm_param_ecs" {
   })
 }
 
+
+
+resource "aws_iam_policy" "ecslogs" {
+  name        = "ecslogs-${var.project_id}"
+  path        = "/"
+  description = "awslogs permissions for ECS to CloudWatch"
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "logs:PutLogEvents",
+            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:${var.project_id}:log-stream:${var.project_id}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup"
+            ],
+            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:${var.project_id}"
+        }
+    ]
+})
+}
+
 resource "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
   name        = "AmazonECSTaskExecutionRolePolicy-${var.project_id}"
   path        = "/"
@@ -311,6 +338,11 @@ resource "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
 resource "aws_iam_role_policy_attachment" "AmazonECSTaskExecutionRolePolicy" {
   role       = aws_iam_role.ecs_execution.name
   policy_arn = resource.aws_iam_policy.AmazonECSTaskExecutionRolePolicy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecslogs" {
+  role       = aws_iam_role.ecs_execution.name
+  policy_arn = resource.aws_iam_policy.ecslogs.arn
 }
 
 resource "aws_iam_role" "ecs_task_role" {
@@ -375,6 +407,15 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "dockerLabels": {},
         "ulimits": [],
         "systemControls": [],
+        "logConfiguration": {
+            "logDriver": "awslogs",
+            "options": {
+                "awslogs-create-group": "true",
+                "awslogs-group": "${var.project_id}",
+                "awslogs-region": "${var.region}",
+                "awslogs-stream-prefix": "${var.project_id}"
+            }
+          },
         "resourceRequirements": [
             {
                 "value": "1",
