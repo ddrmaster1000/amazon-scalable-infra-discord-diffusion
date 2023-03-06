@@ -50,7 +50,7 @@ resource "aws_codebuild_project" "image_builder" {
 
   source {
     type            = "GITHUB"
-    location        = "https://github.com/ddrmaster1000/amazon-scalable-discord-diffusion.git"
+    location        = var.git_codebuild
     git_clone_depth = 1
   }
   source_version = var.git_branch
