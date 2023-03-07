@@ -6,6 +6,7 @@ This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An A
 Please use the [following link]() for a walkthrough on how to use this project.
 
 # Commandline exports
+The following variables must be exported to the commandline in order for ```terraform apply``` to work. See the variables.tf files if you need guidance on what these variables mean.<br>
 ```export TF_VAR_discord_bot_secret=''```<br>
 ```export TF_VAR_github_personal_access_token=''```<br>
 ```export TF_VAR_docker_password=''```<br>

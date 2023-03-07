@@ -43,7 +43,7 @@ variable "docker_password" {
 }
 
 variable "git_codebuild" {
-  description = "Git clone https url that codebuild uses to build the ecr image"
+  description = "Git clone https url that codebuild uses to build the ecr image. This will require you to fork the repo into your own Github account."
   type        = string
 }
 
@@ -53,6 +53,6 @@ variable "git_branch" {
 }
 
 variable "github_personal_access_token" {
-  description = "Personal access token from Github"
+  description = "Personal access token from Github. Requires Tokens (classic). Must have the scopes repo, repo:status, admin:repo_hook"
   type        = string
 }
