@@ -13,7 +13,24 @@ resource "aws_sqs_queue" "default_queue" {
   sqs_managed_sse_enabled     = true
   fifo_queue                  = true
   content_based_deduplication = true
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.terraform_queue_deadletter.arn
+    maxReceiveCount     = 2
+  })
 }
+
+# Dead Letter Queue
+resource "aws_sqs_queue" "terraform_queue_deadletter" {
+  name = "dead-letter-${var.project_id}.fifo"
+  fifo_queue                  = true
+  sqs_managed_sse_enabled     = true
+
+  # redrive_allow_policy = jsonencode({
+  #   redrivePermission = "byQueue",
+  #   sourceQueueArns   = [aws_sqs_queue.default_queue.arn]
+  # })
+}
+
 
 ### API Gateway ###
 resource "aws_apigatewayv2_api" "discord_gw" {
