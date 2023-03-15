@@ -98,6 +98,18 @@
                 {
                     "name": "Stable Diffusion",
                     "value": "stable_diffusion"
+                },
+                {
+                    "name": "Deliberate",
+                    "value": "Deliberate"
+                },
+                {
+                    "name": "Pastel Mix",
+                    "value": "Pastel Mix"
+                },
+                {
+                    "name": "Cheese Daddys Landscape Mix",
+                    "value": "Cheese Daddys Landscape Mix"
                 }
             ]
         }
