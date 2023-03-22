@@ -397,7 +397,13 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "entryPoint": [],
         "command": [],
         "environmentFiles": [],
-        "mountPoints": [],
+        "mountPoints": [
+                {
+                    "sourceVolume": "myEfsVolume-${var.project_id}",
+                    "containerPath": "/mount/efs/models",
+                    "readOnly": false
+                }
+            ],
         "volumesFrom": [],
         "secrets": [],
         "dnsServers": [],
@@ -425,6 +431,16 @@ resource "aws_ecs_task_definition" "ecs_task" {
     }
   ]
   TASK_DEFINITION
+
+  volume {
+    name = "myEfsVolume-${var.project_id}"
+
+    efs_volume_configuration {
+      file_system_id          = aws_efs_file_system.ecs-task.id
+      root_directory          = "/opt/models"
+      transit_encryption      = "ENABLED"
+    }
+  }
 
   depends_on = [
     aws_iam_role.ecs_task_role,
@@ -458,5 +474,17 @@ resource "aws_ecs_service" "discord_diffusion" {
   deployment_circuit_breaker {
     enable   = true
     rollback = true
+  }
+}
+
+### EFS Volume ###
+resource "aws_efs_file_system" "ecs-task" {
+  creation_token = var.project_id
+  encrypted = true
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  lifecycle_policy {
+    transition_to_primary_storage_class = "AFTER_1_ACCESS"
   }
 }
