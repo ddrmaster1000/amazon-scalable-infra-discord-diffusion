@@ -513,4 +513,5 @@ resource "aws_efs_mount_target" "efs_task" {
   for_each = toset(data.aws_subnets.public.ids)
   file_system_id = aws_efs_file_system.ecs-task.id
   subnet_id      = each.value
+  security_groups = [aws_security_group.ecs_discord.id]
 }
