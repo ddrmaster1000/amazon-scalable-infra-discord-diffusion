@@ -21,9 +21,9 @@ resource "aws_sqs_queue" "default_queue" {
 
 # Dead Letter Queue
 resource "aws_sqs_queue" "terraform_queue_deadletter" {
-  name = "dead-letter-${var.project_id}.fifo"
-  fifo_queue                  = true
-  sqs_managed_sse_enabled     = true
+  name                    = "dead-letter-${var.project_id}.fifo"
+  fifo_queue              = true
+  sqs_managed_sse_enabled = true
 
   # redrive_allow_policy = jsonencode({
   #   redrivePermission = "byQueue",

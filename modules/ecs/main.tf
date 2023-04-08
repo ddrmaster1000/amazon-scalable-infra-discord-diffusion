@@ -123,13 +123,33 @@ resource "aws_security_group" "ecs_discord" {
   #     cidr_blocks      = ["0.0.0.0/0"]
   #   }
 
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-    ipv6_cidr_blocks = ["::/0"]
-  }
+  # ingress {
+  #   description      = "EFS NFS ${var.project_id}"
+  #   from_port        = 2049
+  #   to_port          = 2049
+  #   protocol         = "tcp"
+  #   cidr_blocks      = ["0.0.0.0/0"]
+  # }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "nfs_efs" {
+  security_group_id            = aws_security_group.ecs_discord.id
+  referenced_security_group_id = aws_security_group.ecs_discord.id
+  from_port                    = 2049
+  ip_protocol                  = "tcp"
+  to_port                      = 2049
+}
+
+resource "aws_vpc_security_group_egress_rule" "internet_out_ipv4" {
+  security_group_id = aws_security_group.ecs_discord.id
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "internet_out_ipv6" {
+  security_group_id = aws_security_group.ecs_discord.id
+  ip_protocol       = "-1"
+  cidr_ipv6         = "::/0"
 }
 
 # Role for ECS
@@ -286,23 +306,23 @@ resource "aws_iam_policy" "ecslogs" {
   description = "awslogs permissions for ECS to CloudWatch"
 
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": "logs:PutLogEvents",
-            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}:log-stream:${var.project_id}"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "logs:CreateLogStream",
-                "logs:CreateLogGroup"
-            ],
-            "Resource": "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}"
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : "logs:PutLogEvents",
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}:log-stream:${var.project_id}"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup"
+        ],
+        "Resource" : "arn:aws:logs:${var.region}:${var.account_id}:log-group:ecs-${var.project_id}"
+      }
     ]
-})
+  })
 }
 
 resource "aws_iam_policy" "AmazonECSTaskExecutionRolePolicy" {
@@ -397,7 +417,13 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "entryPoint": [],
         "command": [],
         "environmentFiles": [],
-        "mountPoints": [],
+        "mountPoints": [
+                {
+                    "sourceVolume": "efs-${var.project_id}",
+                    "containerPath": "/mount/efs/models",
+                    "readOnly": false
+                }
+            ],
         "volumesFrom": [],
         "secrets": [],
         "dnsServers": [],
@@ -426,6 +452,16 @@ resource "aws_ecs_task_definition" "ecs_task" {
   ]
   TASK_DEFINITION
 
+  volume {
+    name = "efs-${var.project_id}"
+
+    efs_volume_configuration {
+      file_system_id     = aws_efs_file_system.ecs-task.id
+      root_directory     = "/"
+      transit_encryption = "ENABLED"
+    }
+  }
+
   depends_on = [
     aws_iam_role.ecs_task_role,
     aws_iam_role.ecs_execution
@@ -433,7 +469,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logging" {
-  name = "ecs-${var.project_id}"
+  name              = "ecs-${var.project_id}"
   retention_in_days = 7
 }
 
@@ -459,4 +495,23 @@ resource "aws_ecs_service" "discord_diffusion" {
     enable   = true
     rollback = true
   }
+}
+
+### EFS Volume ###
+resource "aws_efs_file_system" "ecs-task" {
+  creation_token = var.project_id
+  encrypted      = true
+  lifecycle_policy {
+    transition_to_ia = "AFTER_7_DAYS"
+  }
+  lifecycle_policy {
+    transition_to_primary_storage_class = "AFTER_1_ACCESS"
+  }
+}
+
+resource "aws_efs_mount_target" "efs_task" {
+  for_each = toset(data.aws_subnets.public.ids)
+  file_system_id = aws_efs_file_system.ecs-task.id
+  subnet_id      = each.value
+  security_groups = [aws_security_group.ecs_discord.id]
 }

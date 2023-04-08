@@ -76,6 +76,13 @@ resource "aws_codebuild_source_credential" "github" {
   token       = var.github_personal_access_token
 }
 
+resource "aws_ssm_parameter" "secret" {
+  name        = "/${var.project_id}/github_personal_access_token"
+  description = "Github personal access token"
+  type        = "SecureString"
+  value       = var.github_personal_access_token
+}
+
 resource "aws_codebuild_webhook" "image_builder" {
   project_name = aws_codebuild_project.image_builder.name
   build_type   = "BUILD"
