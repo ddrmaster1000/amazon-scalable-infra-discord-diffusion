@@ -78,6 +78,7 @@ resource "aws_lambda_function" "discord_api_to_lambda" {
       APPLICATION_ID = var.discord_application_id,
       PUBLIC_KEY     = var.discord_public_key,
       SQS_QUEUE_URL  = aws_sqs_queue.default_queue.url
+      DYNAMODB       = var.dynamodb_table_name
     }
   }
 
@@ -98,6 +99,26 @@ data "archive_file" "discord_api_to_lambda" {
 resource "aws_cloudwatch_log_group" "discord_api_to_lambda" {
   name              = local.cloud_watch_group
   retention_in_days = 14
+}
+
+resource "aws_iam_policy" "discord_api_lambda_dynamodb" {
+  name        = "dynamodb-${var.project_id}"
+  path        = "/"
+  description = "${var.project_id} IAM policy for putting items into DynamoDB."
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem"
+        ],
+        "Resource" : "${var.dynamodb_arn}",
+        "Effect" : "Allow"
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "discord_api_lambda_logging" {
@@ -161,4 +182,9 @@ resource "aws_iam_role_policy_attachment" "discord_api_to_lambda" {
 resource "aws_iam_role_policy_attachment" "discord_api_to_lambda_sqs" {
   role       = aws_iam_role.discord_api_to_lambda.name
   policy_arn = aws_iam_policy.lambda_send_sqs_message.arn
+}
+
+resource "aws_iam_role_policy_attachment" "discord_api_lambda_dynamodb" {
+  role       = aws_iam_role.discord_api_to_lambda.name
+  policy_arn = aws_iam_policy.discord_api_lambda_dynamodb.arn
 }

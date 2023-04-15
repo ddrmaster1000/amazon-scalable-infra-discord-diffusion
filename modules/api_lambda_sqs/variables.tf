@@ -32,3 +32,13 @@ variable "requests_arn" {
   description = "Lambda Layer request's arn"
   type        = string
 }
+
+variable "dynamodb_table_name" {
+  description = "DynamoDB Table's name/id"
+  type        = string
+}
+
+variable "dynamodb_arn" {
+  description = "DynamoDB Table's ARN"
+  type        = string
+}

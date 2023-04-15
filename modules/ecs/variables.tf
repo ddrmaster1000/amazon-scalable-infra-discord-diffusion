@@ -22,3 +22,18 @@ variable "sqs_queue_url" {
   description = "SQS Queue URL"
   type        = string
 }
+
+variable "subnet_a_id" {
+  description = "Subnet id 'a' of the created VPC"
+  type        = string
+}
+
+variable "subnet_b_id" {
+  description = "Subnet id 'b' of the created VPC"
+  type        = string
+}
+
+variable "subnet_c_id" {
+  description = "Subnet id 'c' of the created VPC"
+  type        = string
+}

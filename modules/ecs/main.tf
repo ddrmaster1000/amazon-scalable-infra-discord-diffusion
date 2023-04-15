@@ -33,16 +33,7 @@ resource "aws_ecr_lifecycle_policy" "foopolicy" {
 EOF
 }
 
-data "aws_subnets" "public" {
-  filter {
-    name   = "vpc-id"
-    values = [var.vpc_id]
-  }
 
-  tags = {
-    Tier = "Public"
-  }
-}
 
 data "aws_kms_key" "ebs" {
   key_id = "alias/aws/ebs"
@@ -107,6 +98,17 @@ resource "aws_launch_template" "discord_diffusion" {
     Name = "${var.project_id}"
   }
 
+}
+
+data "aws_subnets" "public" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+
+  tags = {
+    Tier = "Public"
+  }
 }
 
 resource "aws_security_group" "ecs_discord" {
@@ -509,9 +511,21 @@ resource "aws_efs_file_system" "ecs-task" {
   }
 }
 
-resource "aws_efs_mount_target" "efs_task" {
-  for_each = toset(data.aws_subnets.public.ids)
-  file_system_id = aws_efs_file_system.ecs-task.id
-  subnet_id      = each.value
+# EFS Mount Targets
+resource "aws_efs_mount_target" "efs_task_a" {
+  file_system_id  = aws_efs_file_system.ecs-task.id
+  subnet_id       = var.subnet_a_id
+  security_groups = [aws_security_group.ecs_discord.id]
+}
+
+resource "aws_efs_mount_target" "efs_task_b" {
+  file_system_id  = aws_efs_file_system.ecs-task.id
+  subnet_id       = var.subnet_b_id
+  security_groups = [aws_security_group.ecs_discord.id]
+}
+
+resource "aws_efs_mount_target" "efs_task_c" {
+  file_system_id  = aws_efs_file_system.ecs-task.id
+  subnet_id       = var.subnet_c_id
   security_groups = [aws_security_group.ecs_discord.id]
 }
