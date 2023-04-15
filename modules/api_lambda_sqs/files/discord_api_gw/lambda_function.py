@@ -113,7 +113,8 @@ def dynamodbPutItem(customer_data):
     # Add Time
     value = datetime.datetime.fromtimestamp(time.time())
     my_time = value.strftime('%Y-%m-%d %H:%M:%S')
-    cleaned_customer_data['interactionId'] = my_time
+    cleaned_customer_data['interactionId'] = f"{my_time}%{cleaned_customer_data['userId']}"
+    cleaned_customer_data['timestamp'] = my_time
     print(f"Message Data: {customer_data}")
     print(f"Cleaned Customer Data: {cleaned_customer_data}")
     table.put_item(
