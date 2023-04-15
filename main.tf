@@ -2,7 +2,21 @@ locals {
   unique_project = "${var.project_id}-${var.unique_id}"
 }
 
-data "aws_region" "current" {}
+data "aws_region" "current" {}   
+
+module "vpc" {
+  source     = "./modules/vpc"
+  account_id = data.aws_caller_identity.current.account_id
+  project_id = local.unique_project
+  region     = data.aws_region.current.name
+}
+
+module "dynamodb" {
+  source     = "./modules/dynamodb"
+  account_id = data.aws_caller_identity.current.account_id
+  project_id = local.unique_project
+  region     = data.aws_region.current.name
+}
 
 # API Gateway, Discord Lambda handler, and SQS
 module "api_gw_lambda" {
@@ -14,6 +28,11 @@ module "api_gw_lambda" {
   discord_public_key     = var.discord_public_key
   pynacl_arn             = aws_lambda_layer_version.pynacl.arn
   requests_arn           = aws_lambda_layer_version.requests.arn
+  dynamodb_table_name    = module.dynamodb.dynamodb_table_name
+  dynamodb_arn = module.dynamodb.dynamodb_arn
+  depends_on = [
+    module.dynamodb
+  ]
 }
 
 # A Lambda function that creates the Discord UI
@@ -33,10 +52,14 @@ module "ecs_cluster" {
   project_id    = local.unique_project
   account_id    = data.aws_caller_identity.current.account_id
   region        = data.aws_region.current.name
-  vpc_id        = var.vpc_id
+  vpc_id        = module.vpc.vpc_id
   sqs_queue_url = module.api_gw_lambda.sqs_queue_url
+  subnet_a_id   = module.vpc.subnet_a_id
+  subnet_b_id   = module.vpc.subnet_b_id
+  subnet_c_id   = module.vpc.subnet_c_id
   depends_on = [
     module.api_gw_lambda,
+    module.vpc
   ]
 }
 
@@ -45,7 +68,7 @@ module "metrics_scaling" {
   source          = "./modules/scaling_alarm_lambda"
   project_id      = local.unique_project
   region          = data.aws_region.current.name
-  vpc_id          = var.vpc_id
+  vpc_id          = module.vpc.vpc_id
   account_id      = data.aws_caller_identity.current.account_id
   sqs_queue_url   = module.api_gw_lambda.sqs_queue_url
   asg_name        = module.ecs_cluster.asg_name
@@ -53,7 +76,8 @@ module "metrics_scaling" {
   ecs_service_arn = module.ecs_cluster.ecs_service_arn
   depends_on = [
     module.ecs_cluster,
-    module.api_gw_lambda
+    module.api_gw_lambda,
+    module.vpc
   ]
 }
 

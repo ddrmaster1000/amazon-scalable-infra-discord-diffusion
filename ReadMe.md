@@ -1,9 +1,14 @@
 # Description
-This project deploys the infrastructure needed for [TODO-MY-GITHUB-HERE](). An Architecture Diagram is shown below.
+This project deploys the infrastructure needed for [the docker files](https://github.com/ddrmaster1000/amazon-scalable-discord-diffusion). An Architecture Diagram is shown below.
 ![Infrastructure Diagram](/files/discord-diffusion-diagram.png)
 
 # AWS Article
-Please use the [following link]() for a walkthrough on how to use this project.
+Please use the [following link](https://aws.amazon.com/blogs/architecture/an-elastic-deployment-of-stable-diffusion-with-discord-on-aws/) for a walkthrough on how to use this project.
+
+# Deployment
+* Deploy in a region with a, b, and c availability zones. Such as us-west-2, us-east-1, us-east-2, etc.
+* Ensure the region you have in the commandline if using the commandline is the region you will be deploying to. run ```aws configure``` to see the region. 
+* After running a successful ```terraform apply```, it is required to start the CodeBuild run to create the docker image this project uses. 
 
 # Commandline exports
 The following variables must be exported to the commandline in order for ```terraform apply``` to work. See the variables.tf files if you need guidance on what these variables mean.<br>
