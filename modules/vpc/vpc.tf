@@ -66,6 +66,11 @@ resource "aws_route_table" "main" {
   }
 }
 
+resource "aws_main_route_table_association" "main" {
+  vpc_id         = aws_vpc.main.id
+  route_table_id = aws_route_table.main.id
+}
+
 # Route Table Associations
 resource "aws_route_table_association" "a" {
   subnet_id      = aws_subnet.a.id
@@ -73,11 +78,11 @@ resource "aws_route_table_association" "a" {
 }
 
 resource "aws_route_table_association" "b" {
-  subnet_id      = aws_subnet.a.id
+  subnet_id      = aws_subnet.b.id
   route_table_id = aws_route_table.main.id
 }
 
 resource "aws_route_table_association" "c" {
-  subnet_id      = aws_subnet.a.id
+  subnet_id      = aws_subnet.c.id
   route_table_id = aws_route_table.main.id
 }
