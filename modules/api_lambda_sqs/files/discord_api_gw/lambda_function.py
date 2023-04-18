@@ -189,9 +189,9 @@ def lambda_handler(event, context):
         user_id = info['member']['user']['id']
         username = info['member']['user']['username']
         customer_data = decideInputs(customer_data)
+        message_response = messageResponse(customer_data)
         sqs_message = sqsMessageCleaning(customer_data, it_id, it_token, user_id, username, APPLICATION_ID)
         sendSQSMessage(sqs_message, user_id)
-        message_response = messageResponse(customer_data)
         dynamodbPutItem(sqs_message)
         # Respond to user
         print("Going to return some data!")
@@ -206,12 +206,25 @@ def lambda_handler(event, context):
             }
     except Exception as e:
         print(e)
-        return {
-            "type": RESPONSE_TYPES['CHANNEL_MESSAGE_WITH_SOURCE'],
-            "data": {
-                "tts": False,
-                "content": f"Sorry, we are having issues processing requests right now. Come back later :slight_smile: ",
-                "embeds": [],
-                "allowed_mentions": { "parse": [] }
+        try: 
+            # Respond to user with their request written down
+            return {
+                "type": RESPONSE_TYPES['CHANNEL_MESSAGE_WITH_SOURCE'],
+                "data": {
+                    "tts": False,
+                    "content": f"Sorry, we are having issues processing requests right now. Come back later :slight_smile:\n{message_response} ",
+                    "embeds": [],
+                    "allowed_mentions": { "parse": [] }
+                }
             }
-        }
+        except:
+            # Nothing worked response
+            return {
+                "type": RESPONSE_TYPES['CHANNEL_MESSAGE_WITH_SOURCE'],
+                "data": {
+                    "tts": False,
+                    "content": f"Sorry, we are having issues processing requests right now. Come back later :slight_smile: ",
+                    "embeds": [],
+                    "allowed_mentions": { "parse": [] }
+                }
+            }
