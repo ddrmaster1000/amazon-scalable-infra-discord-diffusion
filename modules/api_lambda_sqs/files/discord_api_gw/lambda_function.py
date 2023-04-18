@@ -204,8 +204,8 @@ def lambda_handler(event, context):
                     "allowed_mentions": { "parse": [] }
                 }
             }
-    except:
-                
+    except Exception as e:
+        print(e)
         return {
             "type": RESPONSE_TYPES['CHANNEL_MESSAGE_WITH_SOURCE'],
             "data": {
