@@ -193,8 +193,8 @@ def lambda_handler(event, context):
         customer_data = decideInputs(customer_data)
         message_response = messageResponse(customer_data)
         sqs_message = sqsMessageCleaning(customer_data, it_id, it_token, user_id, username, APPLICATION_ID)
-        sendSQSMessage(sqs_message, user_id)
-        dynamodbPutItem(sqs_message)
+        sendSQSMessage(sqs_message.copy(), user_id)
+        dynamodbPutItem(sqs_message.copy())
         # Respond to user
         print("Going to return some data!")
         return {
