@@ -62,6 +62,8 @@ def sqsMessageCleaning(customer_data, it_id, it_token, user_id, username, applic
     
 def sendSQSMessage(MyMessageAttributes, user_id):
     # Send message to SQS queue
+    for key in ['username', 'userId', 'interactionId']:
+        MyMessageAttributes.pop(key)
     response = sqs.send_message(
         QueueUrl=QUEUE_URL,
         MessageAttributes=MyMessageAttributes,
