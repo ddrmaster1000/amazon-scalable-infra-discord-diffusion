@@ -73,7 +73,7 @@ resource "aws_launch_template" "discord_diffusion" {
   #     market_type = "spot"
   #   }
 
-  instance_type = "g4dn.xlarge"
+  instance_type = "inf2.xlarge"
 
   # If you want to ssh/login to your instances, reference your key pair here.
   # key_name = "YOUR KEY PAIR HERE"
