@@ -126,9 +126,9 @@ def dynamodbPutItem(customer_data):
 def decideInputs(user_dict):
     default_dict = {
         'seed': random.randint(0,99999),
-        'steps': 16,
+        'steps': 4,
         'sampler': "k_euler_a",
-        'model': "stable_diffusion"
+        'model': "Jingya/lcm-sdxl-neuronx",
     }
 
     for internal_var, default in default_dict.items():
@@ -144,7 +144,6 @@ def messageResponse(customer_data):
         'negative_prompt': 'Negative Prompt',
         'seed': 'Seed',
         'steps': 'Steps',
-        'sampler': 'Sampler',
         'model': 'model'
     }
 
