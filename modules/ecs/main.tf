@@ -444,12 +444,27 @@ resource "aws_ecs_task_definition" "ecs_task" {
                 "awslogs-stream-prefix": "${var.project_id}"
             }
           },
-        "resourceRequirements": [
-            {
-                "value": "1",
-                "type": "GPU"
-            }
-        ]
+          "linuxParameters": {
+            "devices": [
+              {
+                "containerPath": "/dev/neuron0",
+                "hostPath": "/dev/neuron0",
+                "permissions": [
+                    "read",
+                    "write"
+                ]
+              }
+            ],               
+             "capabilities": {
+                    "add": [
+                        "IPC_LOCK"
+                    ]
+                }
+            },
+      placement_constraints {
+        type       = "memberOf"
+        expression = "attribute:ecs.instance-type == ${instance_type}"
+      }
     }
   ]
   TASK_DEFINITION
