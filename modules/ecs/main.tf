@@ -450,21 +450,21 @@ resource "aws_ecs_task_definition" "ecs_task" {
                 "containerPath": "/dev/neuron0",
                 "hostPath": "/dev/neuron0",
                 "permissions": [
-                    "read",
-                    "write"
+                  "read",
+                  "write"
                 ]
               }
             ],               
-             "capabilities": {
-                    "add": [
-                        "IPC_LOCK"
-                    ]
-                }
-            },
-      placement_constraints {
-        type       = "memberOf"
-        expression = "attribute:ecs.instance-type == ${instance_type}"
-      }
+            "capabilities": {
+              "add": [
+                "IPC_LOCK"
+              ]
+            }
+          },
+          "placement_constraints": {
+            "type": "memberOf",
+            "expression": "attribute:ecs.instance-type == inf2.xlarge"
+          }
     }
   ]
   TASK_DEFINITION
