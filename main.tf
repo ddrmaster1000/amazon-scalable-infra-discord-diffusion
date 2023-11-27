@@ -2,7 +2,7 @@ locals {
   unique_project = "${var.project_id}-${var.unique_id}"
 }
 
-data "aws_region" "current" {}   
+data "aws_region" "current" {}
 
 module "vpc" {
   source     = "./modules/vpc"
@@ -29,7 +29,7 @@ module "api_gw_lambda" {
   pynacl_arn             = aws_lambda_layer_version.pynacl.arn
   requests_arn           = aws_lambda_layer_version.requests.arn
   dynamodb_table_name    = module.dynamodb.dynamodb_table_name
-  dynamodb_arn = module.dynamodb.dynamodb_arn
+  dynamodb_arn           = module.dynamodb.dynamodb_arn
   depends_on = [
     module.dynamodb
   ]
