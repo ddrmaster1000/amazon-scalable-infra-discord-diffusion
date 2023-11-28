@@ -1,5 +1,5 @@
 output "ami" {
-  value = data.aws_ssm_parameter.ecs_gpu_ami.value
+  value = data.aws_ssm_parameter.ecs_inf2_ami.value
 }
 
 output "asg_name" {
