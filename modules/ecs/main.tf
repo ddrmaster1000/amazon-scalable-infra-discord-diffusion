@@ -44,6 +44,8 @@ data "aws_kms_key" "ebs" {
 }
 
 
+# Found that the ECS ami with neuron did not work with huggingface container. Unsure why. 
+# Ran into memory errors while downloading model to neuron device.
 # EC2 Launch Template with Neuron drivers and ECS Drivers
 # Make sure your aws config is setup with the region you want to deploy!
 data "aws_ssm_parameter" "ecs_inf2_ami" {
@@ -58,6 +60,7 @@ resource "aws_launch_template" "discord_diffusion" {
 
     ebs {
       volume_size = 80
+      iops = 3000
       volume_type = "gp3"
       encrypted   = true
       kms_key_id  = data.aws_kms_key.ebs.arn
@@ -83,15 +86,8 @@ resource "aws_launch_template" "discord_diffusion" {
   # key_name = "YOUR KEY PAIR HERE"
   vpc_security_group_ids = [aws_security_group.ecs_discord.id]
 
-  user_data = base64encode(
-    <<EOT
-    #!/bin/bash
-    cat <<'EOF' >> /etc/ecs/ecs.config
-    ECS_CLUSTER=${aws_ecs_cluster.discord.id}
-    ECS_ENABLE_GPU_SUPPORT=true
-    EOF
-    EOT
-  )
+  user_data = base64encode(templatefile("${path.module}/userdata.sh", {cluster-id = aws_ecs_cluster.discord.id}))
+
 
   depends_on = [
     aws_ecs_cluster.discord,
