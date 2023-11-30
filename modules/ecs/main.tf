@@ -1,5 +1,9 @@
 # ECS Resource
-# This assumes you already have ECR setup and the image placed in ECR.
+# Create local variable called instance_type
+locals {
+  instance_type = "inf2.xlarge"
+}
+
 resource "aws_ecs_cluster" "discord" {
   name = var.project_id
 }
@@ -40,10 +44,12 @@ data "aws_kms_key" "ebs" {
 }
 
 
-# EC2 Launch Template with Nvidia drivers and ECS Drivers
+# Found that the ECS ami with neuron did not work with huggingface container. Unsure why. 
+# Ran into memory errors while downloading model to neuron device.
+# EC2 Launch Template with Neuron drivers and ECS Drivers
 # Make sure your aws config is setup with the region you want to deploy!
-data "aws_ssm_parameter" "ecs_gpu_ami" {
-  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/gpu/recommended/image_id"
+data "aws_ssm_parameter" "ecs_inf2_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/inf/recommended/image_id"
 }
 
 resource "aws_launch_template" "discord_diffusion" {
@@ -53,7 +59,8 @@ resource "aws_launch_template" "discord_diffusion" {
     device_name = "/dev/xvda"
 
     ebs {
-      volume_size = 50
+      volume_size = 80
+      iops = 3000
       volume_type = "gp3"
       encrypted   = true
       kms_key_id  = data.aws_kms_key.ebs.arn
@@ -64,7 +71,7 @@ resource "aws_launch_template" "discord_diffusion" {
     arn = aws_iam_instance_profile.ecs_discord.arn
   }
 
-  image_id                             = data.aws_ssm_parameter.ecs_gpu_ami.value
+  image_id                             = data.aws_ssm_parameter.ecs_inf2_ami.value
   update_default_version               = true
   instance_initiated_shutdown_behavior = "terminate"
 
@@ -73,21 +80,14 @@ resource "aws_launch_template" "discord_diffusion" {
   #     market_type = "spot"
   #   }
 
-  instance_type = "g4dn.xlarge"
+  instance_type = local.instance_type
 
   # If you want to ssh/login to your instances, reference your key pair here.
   # key_name = "YOUR KEY PAIR HERE"
   vpc_security_group_ids = [aws_security_group.ecs_discord.id]
 
-  user_data = base64encode(
-    <<EOT
-    #!/bin/bash
-    cat <<'EOF' >> /etc/ecs/ecs.config
-    ECS_CLUSTER=${aws_ecs_cluster.discord.id}
-    ECS_ENABLE_GPU_SUPPORT=true
-    EOF
-    EOT
-  )
+  user_data = base64encode(templatefile("${path.module}/userdata.sh", {cluster-id = aws_ecs_cluster.discord.id}))
+
 
   depends_on = [
     aws_ecs_cluster.discord,
@@ -412,7 +412,7 @@ resource "aws_ecs_task_definition" "ecs_task" {
         "name": "${var.project_id}",
         "image": "${aws_ecr_repository.ecr.repository_url}:latest",
         "cpu": 4096,
-        "memory": 15700,
+        "memory": 15600,
         "links": [],
         "portMappings": [],
         "essential": true,
@@ -444,12 +444,27 @@ resource "aws_ecs_task_definition" "ecs_task" {
                 "awslogs-stream-prefix": "${var.project_id}"
             }
           },
-        "resourceRequirements": [
-            {
-                "value": "1",
-                "type": "GPU"
+          "linuxParameters": {
+            "devices": [
+              {
+                "containerPath": "/dev/neuron0",
+                "hostPath": "/dev/neuron0",
+                "permissions": [
+                  "read",
+                  "write"
+                ]
+              }
+            ],               
+            "capabilities": {
+              "add": [
+                "IPC_LOCK"
+              ]
             }
-        ]
+          },
+          "placement_constraints": {
+            "type": "memberOf",
+            "expression": "attribute:ecs.instance-type == ${local.instance_type}"
+          }
     }
   ]
   TASK_DEFINITION

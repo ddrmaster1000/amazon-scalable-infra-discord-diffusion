@@ -62,6 +62,14 @@ resource "aws_iam_policy" "ecr_docker_push" {
         "Effect" : "Allow",
         "Action" : "ecr:GetAuthorizationToken",
         "Resource" : "*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        "Resource" : "arn:aws:ecr:*:763104351884:repository/huggingface-pytorch-inference-neuronx*"
       }
     ]
   })

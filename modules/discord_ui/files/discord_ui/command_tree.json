@@ -23,93 +23,37 @@
         },
         {
             "name": "steps",
-            "description": "The number of iterations to complete. Higher number takes longer. Default is 16.",
+            "description": "The number of iterations to complete. Higher number takes longer. Default is 4.",
             "type": 4,
             "required": "False",
             "choices": [
                 {
-                    "name": "8",
-                    "value": 8
+                    "name": "2",
+                    "value": 2
                 },
                 {
-                    "name": "16",
-                    "value": 16
+                    "name": "3",
+                    "value": 3
                 },
                 {
-                    "name": "32",
-                    "value": 32
+                    "name": "4",
+                    "value": 4
                 },
                 {
-                    "name": "64",
-                    "value": 64
-                }
-            ]
-        },
-        {
-            "name": "sampler",
-            "description": "Samplers change how your image is processed. Default is lms",
-            "type": 3,
-            "required": "False",
-            "choices": [
-                {
-                    "name": "k_lms",
-                    "value": "k_lms"
-                },
-                {
-                    "name": "k_euler_a",
-                    "value": "k_euler_a"
-                },
-                {
-                    "name": "PLMS",
-                    "value": "PLMS"
-                },
-                {
-                    "name": "DDIM",
-                    "value": "DDIM"
-                },
-                {
-                    "name": "k_dpm_2_a",
-                    "value": "k_dpm_2_a"
-                },
-                {
-                    "name": "k_dpm_2",
-                    "value": "k_dpm_2"
-                },
-                {
-                    "name": "k_euler",
-                    "value": "k_euler"
-                },
-                {
-                    "name": "k_heun",
-                    "value": "k_heun"
+                    "name": "6",
+                    "value": 6
                 }
             ]
         },
         {
             "name": "model",
-            "description": "Select a model from the options below. Default is stable diffusion 2.1",
+            "description": "Select a model from the options below. Default is Stable Diffusion XL",
             "type": 3,
             "required": "False",
             "choices": [
                 {
-                    "name": "Realistic Vision",
-                    "value": "Realistic Vision"
-                },
-                {
-                    "name": "Stable Diffusion",
-                    "value": "stable_diffusion"
-                },
-                {
-                    "name": "Deliberate",
-                    "value": "Deliberate"
-                },
-                {
-                    "name": "Pastel Mix",
-                    "value": "Pastel Mix"
-                },
-                {
-                    "name": "Fantasy Landscape Mix",
-                    "value": "Cheese Daddys Landscape Mix"
+                    "name": "StableDiffusionXL",
+                    "value": "Jingya/lcm-sdxl-neuronx"
                 }
             ]
         }
